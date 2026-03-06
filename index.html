@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -177,6 +178,42 @@
       color:var(--primary);
     }
     .mode-pill button i { opacity:.85; }
+
+    .mode-select-wrap{ display:flex; align-items:center; gap:8px; min-width:170px; }
+    .mode-select-wrap .lbl{ font-size:11px; font-weight:900; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+    .mode-select{
+      height:36px; border-radius:999px; border:1px solid var(--border);
+      background:rgba(0,0,0,0.02); padding:0 12px; font-weight:900; color:var(--text);
+      min-width:132px;
+    }
+
+    .songLoopSub{ color:var(--text-light); font-weight:800; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .note-loop-pick path, .note-loop-pick text, g.note-loop-pick {
+      fill: #8b5cf6 !important; stroke: #8b5cf6 !important; opacity: 1 !important;
+      filter: drop-shadow(0 0 6px rgba(139,92,246,0.28));
+    }
+    .note-loop-span path, .note-loop-span text, g.note-loop-span {
+      fill: #06b6d4 !important; stroke: #06b6d4 !important; opacity: .95 !important;
+    }
+    .note-loop-edge path, .note-loop-edge text, g.note-loop-edge {
+      fill: #0f766e !important; stroke: #0f766e !important; opacity: 1 !important;
+      filter: drop-shadow(0 0 6px rgba(15,118,110,0.28));
+    }
+
+    .instr-stack{ margin-top:12px; display:grid; gap:10px; }
+    .instr-callout{
+      border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,0.03);
+      padding:12px 14px; font-size:13px; font-weight:800; line-height:1.5;
+    }
+    .instr-list{ margin:0; padding-left:18px; display:grid; gap:6px; font-size:13px; font-weight:800; }
+    .instrItem{ border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,0.02); overflow:hidden; }
+    .instrItem summary{ list-style:none; cursor:pointer; padding:12px 14px; font-weight:900; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .instrItem summary::-webkit-details-marker{ display:none; }
+    .instrItem summary .sumSub{ font-size:12px; color:var(--text-light); font-weight:800; margin-top:2px; }
+    .instrItem[open] summary{ background:rgba(0,0,0,0.04); }
+    .instrBody{ padding:0 14px 14px; font-size:13px; font-weight:800; line-height:1.55; color:var(--text); }
+    .instrBody ul{ margin:8px 0 0; padding-left:18px; display:grid; gap:6px; }
 
     .midi-badge{
       height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--border);
@@ -427,11 +464,14 @@
       <div class="title">Liem Piano Coach</div>
     </div>
 
-    <div class="mode-pill" title="Coach Mode">
-      <button id="mode-beginner" class="active"><i class="fa-solid fa-circle-check"></i> Beginner</button>
-      <button id="mode-flow"><i class="fa-solid fa-forward"></i> Flow</button>
-      <button id="mode-structure"><i class="fa-solid fa-diagram-project"></i> Structure</button>
-      <button id="mode-rhythm"><i class="fa-solid fa-stopwatch"></i> Rhythm</button>
+    <div class="mode-select-wrap" title="Coach Mode">
+      <span class="lbl">Mode</span>
+      <select id="modeSelect" class="mode-select">
+        <option value="beginner" selected>Beginner</option>
+        <option value="flow">Flow</option>
+        <option value="structure">Structure</option>
+        <option value="rhythm">Rhythm</option>
+      </select>
     </div>
 
     <div class="hdr-right">
@@ -457,6 +497,7 @@
       <button id="btnToggleTheme" class="pill ghost" title="Theme"><i class="fa-solid fa-palette"></i></button>
       <button id="btnInstructions" class="pill ghost" title="Instructions"><i class="fa-solid fa-circle-info"></i> Instructions</button>
       <button id="btnAutoScroll" class="pill ghost" title="Auto-scroll sheet to current note"><i class="fa-solid fa-arrows-up-down"></i></button>
+      <button id="btnLoopRange" class="pill ghost" title="Ctrl/Cmd + click 2 notes to loop a range"><i class="fa-solid fa-repeat"></i> Loop Range</button>
       <button id="btnFocusBack" class="pill ghost" style="display:none;"><i class="fa-solid fa-arrow-left"></i> Back</button>
       
       <div id="practiceControls" class="practiceControls">
@@ -543,7 +584,10 @@
             <button id="tab-abc" class="tab active"><i class="fa-solid fa-code"></i> ABC</button>
             <button id="tab-recent" class="tab"><i class="fa-solid fa-clock-rotate-left"></i> Recent</button>
           </div>
-          <button id="btnSave" class="mini primary" title="Save locally"><i class="fa-solid fa-bookmark"></i> Save</button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="btnCopyAbc" class="mini" title="Copy ABC to clipboard"><i class="fa-solid fa-copy"></i> Copy ABC</button>
+            <button id="btnSave" class="mini primary" title="Save locally"><i class="fa-solid fa-bookmark"></i> Save</button>
+          </div>
         </div>
 
         <div id="abcContent">
@@ -570,6 +614,7 @@
           <div id="songMeta">
             <div id="songTitle">—</div>
             <div id="songSub">Paste ABC → Render → Practice (Beginner mode mặc định)</div>
+            <div id="songLoopSub" class="songLoopSub">Loop off • Ctrl/Cmd + click 2 notes để khóa đoạn</div>
           </div>
 
           <div id="coachStrip" class="coachStrip">
@@ -687,35 +732,116 @@
   <div id="instrModal" class="modal-backdrop">
     <div class="modal">
       <h2>Instructions</h2>
-      <p>Dán ABC → Render → (khuyên) Connect MIDI → Practice. Beginner mode phù hợp nhất cho người mới.</p>
-      <div style="margin-top:12px; display:grid; gap:10px;">
-        <div class="stat" style="min-width:unset;">
-          <div class="k">Beginner</div>
-          <div class="v" style="font-size:13px; font-weight:800;">Đúng mới qua bước tiếp theo. Điểm chính là “Đúng ngay lần đầu”.</div>
+      <p>Dán ABC → Render → chọn mode → Practice. Nếu muốn khóa một đoạn, giữ <b>Ctrl/Cmd</b> rồi click 2 nốt để bật <b>Loop Range</b>.</p>
+
+      <div class="instr-stack">
+        <div class="instr-callout">
+          <div style="font-weight:900; margin-bottom:8px;">Luồng dùng nhanh</div>
+          <ol class="instr-list">
+            <li>Dán hoặc sửa ABC ở panel trái.</li>
+            <li>Ấn <b>Render</b> để cập nhật sheet nhạc.</li>
+            <li>Chọn mode trong menu <b>Mode</b> trên header.</li>
+            <li>Kết nối MIDI nếu muốn chấm trực tiếp từ đàn.</li>
+            <li>Ấn <b>Practice</b> để bắt đầu luyện.</li>
+          </ol>
         </div>
-        <div class="stat" style="min-width:unset;">
-          <div class="k">Flow</div>
-          <div class="v" style="font-size:13px; font-weight:800;">Chơi liên tục, sai vẫn chạy. Luyện đọc trôi.</div>
-        </div>
-        <div class="stat" style="min-width:unset;">
-          <div class="k">Structure</div>
-          <div class="v" style="font-size:13px; font-weight:800;">Chấm “hình dáng nhịp” (tỉ lệ trường độ trong ô nhịp/câu). Cho phép nhanh/chậm, nhưng sai cấu trúc sẽ bị tính lỗi.</div>
-        </div>
-        <div class="stat" style="min-width:unset;">
-          <div class="k">Rhythm</div>
-          <div class="v" style="font-size:13px; font-weight:800;">Chấm theo BPM: bấm quá sớm/trễ sẽ bị tính sai.</div>
-        </div>
-        <div class="stat" style="min-width:unset;">
-          <div class="k">Phím tắt</div>
-          <div class="v" style="font-size:13px; font-weight:800;"><b>R</b>: restart ô nhịp • <b>Hint</b>: hiện tên nốt trên sheet</div>
-        </div>
+
+        <details class="instrItem" open>
+          <summary>
+            <div>
+              <div>Beginner</div>
+              <div class="sumSub">Đúng rồi mới qua bước tiếp theo.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Phù hợp nhất cho người mới đọc nốt. Mục tiêu là bấm đúng nốt cần chơi, đặc biệt là đúng ngay lần đầu.
+            <ul>
+              <li>Nốt đơn: đúng mới qua step tiếp theo.</li>
+              <li>Hợp âm: cần giữ đủ nốt và đủ gần nhau.</li>
+              <li>Nếu hợp âm hơi lệch nhau vẫn có thể qua, nhưng vẫn bị tính là chưa đẹp.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Flow</div>
+              <div class="sumSub">Chơi liên tục để luyện đọc trôi.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Mode này phù hợp khi đã biết bài tương đối và muốn giữ dòng chảy. Sai vẫn chạy tiếp, nên nó giống cảm giác đọc bài từ đầu đến cuối hơn.
+            <ul>
+              <li>Phù hợp để luyện tốc độ đọc.</li>
+              <li>Ít bị kẹt ở một nốt quá lâu.</li>
+              <li>Nên dùng sau khi đã quen bài ở Beginner.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Structure</div>
+              <div class="sumSub">Chấm hình dáng nhịp, không bắt tempo tuyệt đối.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Mode này quan tâm tới tương quan trường độ trong ô nhịp/câu nhạc. Bạn có thể chơi nhanh hoặc chậm hơn, miễn là cấu trúc vẫn đúng.
+            <ul>
+              <li>Hữu ích khi muốn hiểu logic trường độ.</li>
+              <li>Cho phép tempo co giãn hơn Rhythm.</li>
+              <li>Vẫn chấm độ chặt của hợp âm.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Rhythm</div>
+              <div class="sumSub">Chấm theo BPM hiện tại.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Mode này bám tempo rõ ràng nhất. Nếu bấm quá sớm hoặc quá trễ so với BPM, app sẽ báo lỗi timing.
+            <ul>
+              <li>Phù hợp khi muốn luyện chính xác với metronome.</li>
+              <li>Nên chỉnh BPM và Count-in trước khi bấm Practice.</li>
+              <li>Dùng tốt khi đã nhớ bài và muốn siết nhịp.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Loop Range & thao tác nhanh</div>
+              <div class="sumSub">Khóa một đoạn để chỉ luyện / phát đúng đoạn đó.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            <ul>
+              <li>Giữ <b>Ctrl/Cmd</b> rồi click nốt thứ nhất, sau đó click nốt thứ hai để tạo loop range.</li>
+              <li>App sẽ lấy theo <b>step thời gian</b>, nên nếu cùng thời điểm có nốt song song ở tay còn lại thì nó cũng được tính vào range.</li>
+              <li>Khi loop đang bật, <b>Play</b> sẽ phát lặp đúng đoạn đó và <b>Practice</b> chỉ chấm trong đoạn đó.</li>
+              <li>Ấn nút <b>Looping</b> một lần nữa để tắt loop.</li>
+              <li><b>R</b>: restart phần hiện tại • <b>Copy ABC</b>: chép nhanh toàn bộ ABC • <b>Save</b>: lưu local.</li>
+            </ul>
+          </div>
+        </details>
       </div>
       <div class="footer">
         <button id="btnInstrClose" class="mini primary">OK</button>
       </div>
     </div>
   </div>
-
 
   <div id="toast-container"></div>
 
@@ -1111,6 +1237,12 @@
         workingABC: '',
         visualObj: null,
         baseBpm: 80,
+      },
+      looping: {
+        draft: [],
+        active: false,
+        startIdx: null,
+        endIdx: null,
       },
       mode: 'beginner', // beginner|flow|structure|rhythm
       activeKeys: new Set(),
@@ -1792,9 +1924,11 @@ const extractSteps = () => {
 
     // ---- Hover dwell tooltip on notes (replaces Hints) ----
     const elementPitchMap = new Map(); // element -> Set(pitches)
+    const elementStepIndexMap = new Map(); // element -> first visible step index
     const buildElementPitchMap = (steps) => {
       elementPitchMap.clear();
-      (steps || []).forEach(step => {
+      elementStepIndexMap.clear();
+      (steps || []).forEach((step, stepIdx) => {
         if (!step || !step.elements || !step.pitches) return;
         const els = step.elements;
         const ps = step.pitches;
@@ -1807,6 +1941,7 @@ const extractSteps = () => {
             const set = elementPitchMap.get(el) || new Set();
             set.add(p);
             elementPitchMap.set(el, set);
+            if (!elementStepIndexMap.has(el)) elementStepIndexMap.set(el, stepIdx);
           }
         } else {
           els.forEach(el => {
@@ -1814,6 +1949,7 @@ const extractSteps = () => {
             const set = elementPitchMap.get(el) || new Set();
             ps.forEach(p => set.add(p));
             elementPitchMap.set(el, set);
+            if (!elementStepIndexMap.has(el)) elementStepIndexMap.set(el, stepIdx);
           });
         }
       });
@@ -1912,6 +2048,126 @@ const extractSteps = () => {
         if (typeof s === 'number' && typeof e === 'number' && e > s) return {start:s, end:e};
       }
       return null;
+    };
+
+    const clearLoopMarks = () => {
+      document.querySelectorAll('g.abcjs-note').forEach(el => {
+        el.classList.remove('note-loop-pick','note-loop-span','note-loop-edge');
+      });
+    };
+
+    const getLoopLabelForStep = (idx) => {
+      const steps = state.practice.expectedSteps || [];
+      const step = steps[idx];
+      if (!step) return '—';
+      const names = uniq(step.pitches || []).sort((a,b)=>a-b).map(midiToName).join(' ');
+      const parallel = Math.max(0, uniq(step.pitches || []).length - 1);
+      return `Step ${idx + 1} • ${names || '—'}${parallel > 0 ? ` • +${parallel} song song` : ''}`;
+    };
+
+    const updateLoopUI = () => {
+      const btn = $('btnLoopRange');
+      const sub = $('songLoopSub');
+      const loop = state.looping || {};
+      if (!btn || !sub) return;
+
+      btn.classList.toggle('toggleOn', !!loop.active);
+      if (loop.active && Number.isFinite(loop.startIdx) && Number.isFinite(loop.endIdx)) {
+        btn.innerHTML = '<i class="fa-solid fa-repeat"></i> Looping';
+        sub.textContent = `Looping: ${getLoopLabelForStep(loop.startIdx)} → ${getLoopLabelForStep(loop.endIdx)} • nốt song song được tính tự động`;
+        return;
+      }
+
+      if ((loop.draft || []).length === 1) {
+        btn.innerHTML = '<i class="fa-solid fa-repeat"></i> Loop Range';
+        sub.textContent = `Loop pick 1/2: ${getLoopLabelForStep(loop.draft[0])}`;
+        return;
+      }
+
+      btn.innerHTML = '<i class="fa-solid fa-repeat"></i> Loop Range';
+      sub.textContent = 'Loop off • Ctrl/Cmd + click 2 notes để khóa đoạn';
+    };
+
+    const applyLoopMarks = () => {
+      clearLoopMarks();
+      const steps = state.practice.expectedSteps || [];
+      const loop = state.looping || {};
+
+      if (loop.active && Number.isFinite(loop.startIdx) && Number.isFinite(loop.endIdx)) {
+        const a = Math.max(0, Math.min(loop.startIdx, loop.endIdx));
+        const b = Math.min(steps.length - 1, Math.max(loop.startIdx, loop.endIdx));
+        for (let i = a; i <= b; i++) {
+          const st = steps[i];
+          if (!st || !st.elements) continue;
+          st.elements.forEach(el => el.classList.add('note-loop-span'));
+        }
+        [a, b].forEach(i => {
+          const st = steps[i];
+          if (!st || !st.elements) return;
+          st.elements.forEach(el => {
+            el.classList.remove('note-loop-span');
+            el.classList.add('note-loop-edge');
+          });
+        });
+      } else if ((loop.draft || []).length === 1) {
+        const st = steps[loop.draft[0]];
+        if (st && st.elements) st.elements.forEach(el => el.classList.add('note-loop-pick'));
+      }
+
+      updateLoopUI();
+    };
+
+    const clearLoopSelection = ({ silent=false } = {}) => {
+      state.looping.draft = [];
+      state.looping.active = false;
+      state.looping.startIdx = null;
+      state.looping.endIdx = null;
+      applyLoopMarks();
+      if (!silent) showToast('Loop off');
+    };
+
+    const setLoopRange = (idxA, idxB) => {
+      const steps = state.practice.expectedSteps || [];
+      if (!steps.length) return;
+      const a = Math.max(0, Math.min(idxA, idxB));
+      const b = Math.min(steps.length - 1, Math.max(idxA, idxB));
+      state.looping.draft = [];
+      state.looping.active = true;
+      state.looping.startIdx = a;
+      state.looping.endIdx = b;
+      applyLoopMarks();
+      showToast(`Looping steps ${a + 1} → ${b + 1}`);
+    };
+
+    const handleLoopNotePick = (noteEl) => {
+      if (state.practice.running) {
+        showToast('Stop practice trước khi đổi loop.');
+        return;
+      }
+      if (!noteEl) return;
+      const idx = elementStepIndexMap.get(noteEl);
+      if (!Number.isFinite(idx)) return;
+
+      if (state.looping.active) {
+        clearLoopSelection({ silent: true });
+      }
+
+      const draft = Array.isArray(state.looping.draft) ? state.looping.draft.slice() : [];
+      if (draft.length === 0) {
+        state.looping.draft = [idx];
+        applyLoopMarks();
+        showToast('Loop pick 1/2');
+        return;
+      }
+
+      if (draft[0] === idx) {
+        state.looping.draft = [];
+        applyLoopMarks();
+        showToast('Loop pick cleared');
+        return;
+      }
+
+      setLoopRange(draft[0], idx);
     };
 
 
@@ -2132,13 +2388,16 @@ V:LH clef=bass name="LH"
         const visualObjs = ABCJS.renderAbc('paper', abc, {
           add_classes: true,
           clickListener: (abcelem, tuneNumber, classes, analysis, drag, mouseEvent) => {
+            const target = mouseEvent && mouseEvent.target && mouseEvent.target.closest ? mouseEvent.target.closest('g.abcjs-note') : null;
+            if (mouseEvent && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+              mouseEvent.preventDefault();
+              handleLoopNotePick(target);
+              return;
+            }
+
             const r = getClickCharRange(abcelem, analysis);
             if (r) {
               selectAbcRange(r.start, r.end);
-              // mark selection on sheet too
-              if (mouseEvent && mouseEvent.target) {
-                // no-op
-              }
               if (document.body.classList.contains('practice-focus')) {
                 showToast('ABC selected (Back to edit to see highlight)');
               }
@@ -2162,6 +2421,12 @@ V:LH clef=bass name="LH"
       state.practice.expectedSteps = steps;
       buildElementPitchMap(steps);
       bindNoteHoverTooltips();
+
+      state.looping.draft = [];
+      state.looping.active = false;
+      state.looping.startIdx = null;
+      state.looping.endIdx = null;
+      applyLoopMarks();
 
       state.practice.barFirstIdx = new Map();
       steps.forEach((s, idx) => {
@@ -2256,6 +2521,17 @@ V:LH clef=bass name="LH"
       return rawMs * (base / target);
     };
 
+    const getActivePracticeRange = () => {
+      const steps = state.practice.expectedSteps || [];
+      if (!steps.length) return { start: 0, end: -1, total: 0 };
+      if (state.looping && state.looping.active && Number.isFinite(state.looping.startIdx) && Number.isFinite(state.looping.endIdx)) {
+        const start = Math.max(0, Math.min(state.looping.startIdx, state.looping.endIdx));
+        const end = Math.min(steps.length - 1, Math.max(state.looping.startIdx, state.looping.endIdx));
+        return { start, end, total: (end - start + 1) };
+      }
+      return { start: 0, end: steps.length - 1, total: steps.length };
+    };
+
     const buildHud = () => {
       const m = state.mode;
       const s = state.practice.stats;
@@ -2283,9 +2559,11 @@ V:LH clef=bass name="LH"
       const i = state.practice.stepIndex;
       const steps = state.practice.expectedSteps;
       const step = steps[i];
-      const total = steps.length;
+      const range = getActivePracticeRange();
+      const total = range.total;
+      const current = step ? Math.min((i - range.start) + 1, total) : total;
 
-      $('coachStep').textContent = `${Math.min(i+1,total)}/${total}`;
+      $('coachStep').textContent = `${Math.max(0,current)}/${total}`;
 
       // Timing/quality are updated by the scoring engines (structure/rhythm/chord tiers)
       const timeEl = $('coachTime');
@@ -2533,10 +2811,13 @@ $('resultSub').textContent = sub;
       }
       if (!state.midi.connected) showToast('Tip: Connect MIDI để chấm đúng hơn.');
 
+      const activeRange = getActivePracticeRange();
+
       clearAllMarks();
+      applyLoopMarks();
       state.practice.running = true;
       state.practice.status = 'countin';
-      state.practice.stepIndex = 0;
+      state.practice.stepIndex = activeRange.start;
       state.practice.currentPressed = new Set();
       state.practice.chordPressed = new Set();
       
@@ -2554,7 +2835,7 @@ $('resultSub').textContent = sub;
       state.practice.loop = null;
 
       const s = state.practice.stats;
-      s.total = state.practice.expectedSteps.length;
+      s.total = activeRange.total;
       s.done = 0; s.correctSteps = 0; s.wrongSteps = 0; s.wrongKeystrokes = 0; s.perfectSteps = 0;
 
       document.body.classList.add('practice-focus');
@@ -2654,7 +2935,8 @@ $('resultSub').textContent = sub;
       state.practice.stepHadError = false;
       state.practice.stepCountedWrong = false;
 
-      if (state.practice.stepIndex >= steps.length) { stopPractice(); return; }
+      const activeRange = getActivePracticeRange();
+      if (state.practice.stepIndex > activeRange.end) { stopPractice(); return; }
 
       highlightStep();
       updateHint('—');
@@ -2776,7 +3058,8 @@ const handleNoteOn = (pitch, vel=100) => {
               state.practice.stepHadError = false;
               state.practice.stepCountedWrong = false;
 
-              if (state.practice.stepIndex >= steps.length) { stopPractice(); return; }
+              const activeRange = getActivePracticeRange();
+              if (state.practice.stepIndex > activeRange.end) { stopPractice(); return; }
               highlightStep();
               buildHud();
               updateHint('—');
@@ -2826,7 +3109,8 @@ const handleNoteOn = (pitch, vel=100) => {
           state.practice.stepHadError = false;
           state.practice.stepCountedWrong = false;
 
-          if (state.practice.stepIndex >= steps.length) { stopPractice(); return; }
+          const activeRange = getActivePracticeRange();
+          if (state.practice.stepIndex > activeRange.end) { stopPractice(); return; }
           highlightStep();
         } else {
           if (reqArr.length > 1) {
@@ -3170,6 +3454,23 @@ const handleNoteOn = (pitch, vel=100) => {
       previewVizLastAddedIdx = -1;
     };
 
+    const getPreviewLoopBoundsMs = () => {
+      const steps = (state.practice && state.practice.expectedSteps) ? state.practice.expectedSteps : [];
+      const range = getActivePracticeRange();
+      if (!steps.length || range.end < range.start) return null;
+      const startStep = steps[range.start];
+      const endStep = steps[range.end];
+      if (!startStep || !endStep) return null;
+      const startMs = Math.max(0, Number(startStep.timeMs || 0));
+      let endMs = Number(endStep.timeMs || 0);
+      const holdEnds = (endStep.holds || []).map(h => endMs + Math.max(0, Number(h && h.durMs || 0)));
+      if (holdEnds.length) endMs = Math.max(endMs, ...holdEnds);
+      const nextStep = steps[range.end + 1];
+      if (nextStep && Number.isFinite(nextStep.timeMs)) endMs = Math.min(endMs, Number(nextStep.timeMs));
+      endMs = Math.max(startMs + 40, endMs);
+      return { startMs, endMs };
+    };
+
     const getPreviewElapsedMs = () => {
       if (previewState === 'playing') return previewPlayedMs + (performance.now() - previewLastStartMs);
       return previewPlayedMs;
@@ -3312,6 +3613,25 @@ const handleNoteOn = (pitch, vel=100) => {
 
     const schedulePreviewEnd = () => {
       clearPreviewTimer();
+      const loopBounds = (state.looping && state.looping.active) ? getPreviewLoopBoundsMs() : null;
+
+      if (loopBounds) {
+        const remainingMs = Math.max(0, loopBounds.endMs - previewPlayedMs);
+        previewTimer = setTimeout(() => {
+          if (previewState !== 'playing' || !previewSynth) return;
+          try {
+            previewSynth.seek(loopBounds.startMs / 1000, 'seconds');
+          } catch (e) {
+            console.error(e);
+          }
+          previewPlayedMs = loopBounds.startMs;
+          previewLastStartMs = performance.now();
+          startPreviewViz(true);
+          schedulePreviewEnd();
+        }, remainingMs + 40);
+        return;
+      }
+
       if (!previewDurationSec) return;
       const remainingMs = Math.max(0, previewDurationSec * 1000 - previewPlayedMs);
       // Add a tiny buffer so we don't flip state too early.
@@ -3386,6 +3706,13 @@ const handleNoteOn = (pitch, vel=100) => {
         }
 
         // stopped -> start
+        const loopBounds = (state.looping && state.looping.active) ? getPreviewLoopBoundsMs() : null;
+        if (loopBounds) {
+          try { previewSynth.seek(loopBounds.startMs / 1000, 'seconds'); } catch (e) { console.error(e); }
+          previewPlayedMs = loopBounds.startMs;
+        } else {
+          previewPlayedMs = 0;
+        }
         previewSynth.start();
         previewState = 'playing';
         previewLastStartMs = performance.now();
@@ -3488,10 +3815,7 @@ const handleNoteOn = (pitch, vel=100) => {
     // ---------- Mode selection ----------
     const setMode = (mode) => {
       state.mode = mode;
-      $('mode-beginner').classList.toggle('active', mode === 'beginner');
-      $('mode-flow').classList.toggle('active', mode === 'flow');
-      $('mode-structure').classList.toggle('active', mode === 'structure');
-      $('mode-rhythm').classList.toggle('active', mode === 'rhythm');
+      if ($('modeSelect')) $('modeSelect').value = mode;
 
       if (mode === 'beginner') showToast('Beginner: đúng mới qua');
       if (mode === 'flow') showToast('Flow: chơi liên tục');
@@ -3550,6 +3874,18 @@ $('tab-abc').onclick = () => switchTab('abc');
         if (!abc) return;
         saveRecent(abc);
       };
+      $('btnCopyAbc').onclick = async () => {
+        try {
+          await navigator.clipboard.writeText($('abcInput').value || '');
+          showToast('ABC copied');
+        } catch (e) {
+          const ta = $('abcInput');
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          showToast('ABC copied');
+        }
+      };
 
       $('btnPractice').onclick = startPractice;
       $('btnStopHdr').onclick = stopPractice;
@@ -3557,10 +3893,7 @@ $('tab-abc').onclick = () => switchTab('abc');
 
       $('btnFocusBack').onclick = exitFocus;
 
-      $('mode-beginner').onclick = () => setMode('beginner');
-      $('mode-flow').onclick = () => setMode('flow');
-      $('mode-structure').onclick = () => setMode('structure');
-      $('mode-rhythm').onclick = () => setMode('rhythm');
+      $('modeSelect').addEventListener('change', () => setMode($('modeSelect').value));
 
       $('bpmRange').addEventListener('input', () => {
         const v = parseInt($('bpmRange').value, 10);
@@ -3586,6 +3919,13 @@ $('tab-abc').onclick = () => switchTab('abc');
 
       $('btnInstructions').onclick = () => openModal('instrModal');
       $('btnAutoScroll').onclick = () => { state.settings.autoScroll = !state.settings.autoScroll; syncAutoScrollUI(); showToast(`Auto-scroll: ${state.settings.autoScroll ? 'ON' : 'OFF'}`); };
+      $('btnLoopRange').onclick = () => {
+        if (state.looping.active || (state.looping.draft || []).length) {
+          clearLoopSelection();
+        } else {
+          showToast('Ctrl/Cmd + click 2 notes để tạo loop.');
+        }
+      };
       $('btnInstrClose').onclick = () => closeModal('instrModal');
       wireMetroPopover();
       syncAutoScrollUI();
@@ -3608,6 +3948,7 @@ $('tab-abc').onclick = () => switchTab('abc');
       else setMidiBadge('off', 'MIDI Off');
 
       buildHud();
+      updateLoopUI();
     };
 
     $('midiModal').addEventListener('click', (e) => { if (e.target === $('midiModal')) closeModal('midiModal'); });
