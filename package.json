@@ -1,0 +1,9 @@
+{
+  "name": "liem-piano-coach",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local syntax checks for the modularized piano coach app",
+  "scripts": {
+    "check:syntax": "node --check src/main.js && node --check src/metronome.js && node --check src/state.js && node --check src/utils.js"
+  }
+}
