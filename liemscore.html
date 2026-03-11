@@ -369,25 +369,145 @@ Tay trai: La3-trang, 7-trang; La3-trang, 7-trang;`;
             { icon: 'restThirtySecond', val: 'z/8', title: 'Lặng móc ba' },
             { label: '𝄆', val: '|:', title: 'Bắt đầu lặp' },
             { label: '𝄇', val: ':|', title: 'Kết thúc lặp' },
-            { label: '[1', val: '[1', title: 'Ending 1' },
-            { label: '[2', val: '[2', title: 'Ending 2' },
             { label: '(', val: '(', title: 'Bắt đầu luyến (slur)' },
             { label: ')', val: ')', title: 'Kết thúc luyến (slur)' },
-            { label: '{ }', val: '{}', title: 'Grace notes' },
             { label: '-', val: '-', title: 'Nối nốt (tie)' },
             { label: '(3', val: '(3', title: 'Bộ ba (triplet)' },
-            { label: '>', val: '>', title: 'Broken rhythm >' },
-            { label: '<', val: '<', title: 'Broken rhythm <' },
-            { label: 'w:', val: 'w:', title: 'Lyrics line' },
-            { label: '!trill!', val: '!trill!', title: 'Decoration: trill' },
-            { label: '!fermata!', val: '!fermata!', title: 'Decoration: fermata' },
-            { label: '!accent!', val: '!accent!', title: 'Decoration: accent' },
-            { label: '!tenuto!', val: '!tenuto!', title: 'Decoration: tenuto' },
-            { label: '!p!', val: '!p!', title: 'Dynamic: piano' },
-            { label: '!mf!', val: '!mf!', title: 'Dynamic: mezzo-forte' },
-            { label: '!f!', val: '!f!', title: 'Dynamic: forte' },
             { label: '‿', val: '-', title: 'Nối nốt' },
         ];
+
+        const buildSymbolPreviewAbc = (body, extraHeader = '') => `X:1
+M:4/4
+L:1/4
+${extraHeader ? extraHeader + '\n' : ''}K:C
+${body}`;
+
+        const TUPLET_MENU_DEFS = [
+            { token: '(2', title: 'Duplet', previewAbc: buildSymbolPreviewAbc('(2CD E2 |]') },
+            { token: '(3', title: 'Triplet', previewAbc: buildSymbolPreviewAbc('(3CDE F2 |]') },
+            { token: '(4', title: 'Quadruplet', previewAbc: buildSymbolPreviewAbc('(4CDEF G2 |]') },
+            { token: '(5', title: 'Quintuplet', previewAbc: buildSymbolPreviewAbc('(5CDEFG A2 |]') },
+            { token: '(6', title: 'Sextuplet', previewAbc: buildSymbolPreviewAbc('(6CDEFGA B2 |]') },
+            { token: '(7', title: 'Septuplet', previewAbc: buildSymbolPreviewAbc('(7CDEFGAB c2 |]') },
+            { header: 'Advanced' },
+            { token: '(3:2:2', title: 'Advanced 3:2:2', previewAbc: buildSymbolPreviewAbc('(3:2:2CDE F2 |]') },
+            { token: '(5:4:5', title: 'Advanced 5:4:5', previewAbc: buildSymbolPreviewAbc('(5:4:5CDEFG A2 |]') },
+            { token: '(7:4:7', title: 'Advanced 7:4:7', previewAbc: buildSymbolPreviewAbc('(7:4:7CDEFGAB c2 |]') },
+        ];
+
+        const DECORATION_MENU_DEFS = [
+            { header: 'Ornaments' },
+            { token: '!trill!', title: 'Trill', previewAbc: buildSymbolPreviewAbc('!trill!C2 |]') },
+            { token: '!trill(!', title: 'Start extended trill', previewAbc: buildSymbolPreviewAbc('!trill(!C D !trill)!E2 |]') },
+            { token: '!trill)!', title: 'End extended trill', previewAbc: buildSymbolPreviewAbc('!trill(!C D !trill)!E2 |]') },
+            { token: '!lowermordent!', title: 'Lower mordent', previewAbc: buildSymbolPreviewAbc('!lowermordent!C2 |]') },
+            { token: '!uppermordent!', title: 'Upper mordent', previewAbc: buildSymbolPreviewAbc('!uppermordent!C2 |]') },
+            { token: '!mordent!', title: 'Same glyph as lowermordent', previewAbc: buildSymbolPreviewAbc('!mordent!C2 |]') },
+            { token: '!pralltriller!', title: 'Same glyph as uppermordent', previewAbc: buildSymbolPreviewAbc('!pralltriller!C2 |]') },
+            { token: '!roll!', title: 'Roll', previewAbc: buildSymbolPreviewAbc('!roll!C2 |]') },
+            { token: '!turn!', title: 'Turn', previewAbc: buildSymbolPreviewAbc('!turn!C2 |]') },
+            { token: '!turnx!', title: 'Turn with line', previewAbc: buildSymbolPreviewAbc('!turnx!C2 |]') },
+            { token: '!invertedturn!', title: 'Inverted turn', previewAbc: buildSymbolPreviewAbc('!invertedturn!C2 |]') },
+            { token: '!invertedturnx!', title: 'Inverted turn with line', previewAbc: buildSymbolPreviewAbc('!invertedturnx!C2 |]') },
+            { token: '!arpeggio!', title: 'Arpeggio', previewAbc: buildSymbolPreviewAbc('!arpeggio![CEGc]2 |]') },
+
+            { header: 'Articulation / Strings' },
+            { token: '!>!', title: 'Accent', previewAbc: buildSymbolPreviewAbc('!>!C2 |]') },
+            { token: '!accent!', title: 'Same as !>!', previewAbc: buildSymbolPreviewAbc('!accent!C2 |]') },
+            { token: '!emphasis!', title: 'Same as !>!', previewAbc: buildSymbolPreviewAbc('!emphasis!C2 |]') },
+            { token: '!fermata!', title: 'Fermata', previewAbc: buildSymbolPreviewAbc('!fermata!C2 |]') },
+            { token: '!invertedfermata!', title: 'Inverted fermata', previewAbc: buildSymbolPreviewAbc('!invertedfermata!C2 |]') },
+            { token: '!tenuto!', title: 'Tenuto', previewAbc: buildSymbolPreviewAbc('!tenuto!C2 |]') },
+            { token: '!+!', title: 'Left-hand pizzicato / plus', previewAbc: buildSymbolPreviewAbc('!+!C2 |]') },
+            { token: '!plus!', title: 'Same as !+!', previewAbc: buildSymbolPreviewAbc('!plus!C2 |]') },
+            { token: '!snap!', title: 'Snap pizzicato', previewAbc: buildSymbolPreviewAbc('!snap!C2 |]') },
+            { token: '!slide!', title: 'Slide', previewAbc: buildSymbolPreviewAbc('!slide!C2 |]') },
+            { token: '!wedge!', title: 'Wedge', previewAbc: buildSymbolPreviewAbc('!wedge!C2 |]') },
+            { token: '!upbow!', title: 'Up bow', previewAbc: buildSymbolPreviewAbc('!upbow!C2 |]') },
+            { token: '!downbow!', title: 'Down bow', previewAbc: buildSymbolPreviewAbc('!downbow!C2 |]') },
+            { token: '!open!', title: 'Open string / harmonic', previewAbc: buildSymbolPreviewAbc('!open!C2 |]') },
+            { token: '!thumb!', title: 'Thumb', previewAbc: buildSymbolPreviewAbc('!thumb!C2 |]') },
+            { token: '!breath!', title: 'Breath mark', previewAbc: buildSymbolPreviewAbc('C!breath! D2 |]') },
+            { token: '!shortphrase!', title: 'Short phrase mark', previewAbc: buildSymbolPreviewAbc('!shortphrase!C2 |]') },
+            { token: '!mediumphrase!', title: 'Medium phrase mark', previewAbc: buildSymbolPreviewAbc('!mediumphrase!C2 |]') },
+            { token: '!longphrase!', title: 'Long phrase mark', previewAbc: buildSymbolPreviewAbc('!longphrase!C2 |]') },
+
+            { header: 'Fingerings' },
+            { token: '!0!', title: 'Fingering 0', previewAbc: buildSymbolPreviewAbc('!0!C2 |]') },
+            { token: '!1!', title: 'Fingering 1', previewAbc: buildSymbolPreviewAbc('!1!C2 |]') },
+            { token: '!2!', title: 'Fingering 2', previewAbc: buildSymbolPreviewAbc('!2!C2 |]') },
+            { token: '!3!', title: 'Fingering 3', previewAbc: buildSymbolPreviewAbc('!3!C2 |]') },
+            { token: '!4!', title: 'Fingering 4', previewAbc: buildSymbolPreviewAbc('!4!C2 |]') },
+            { token: '!5!', title: 'Fingering 5', previewAbc: buildSymbolPreviewAbc('!5!C2 |]') },
+
+            { header: 'Dynamics / Hairpins' },
+            { token: '!pppp!', title: 'pppp', previewAbc: buildSymbolPreviewAbc('!pppp!C2 |]') },
+            { token: '!ppp!', title: 'ppp', previewAbc: buildSymbolPreviewAbc('!ppp!C2 |]') },
+            { token: '!pp!', title: 'pp', previewAbc: buildSymbolPreviewAbc('!pp!C2 |]') },
+            { token: '!p!', title: 'p', previewAbc: buildSymbolPreviewAbc('!p!C2 |]') },
+            { token: '!mp!', title: 'mp', previewAbc: buildSymbolPreviewAbc('!mp!C2 |]') },
+            { token: '!mf!', title: 'mf', previewAbc: buildSymbolPreviewAbc('!mf!C2 |]') },
+            { token: '!f!', title: 'f', previewAbc: buildSymbolPreviewAbc('!f!C2 |]') },
+            { token: '!ff!', title: 'ff', previewAbc: buildSymbolPreviewAbc('!ff!C2 |]') },
+            { token: '!fff!', title: 'fff', previewAbc: buildSymbolPreviewAbc('!fff!C2 |]') },
+            { token: '!ffff!', title: 'ffff', previewAbc: buildSymbolPreviewAbc('!ffff!C2 |]') },
+            { token: '!sfz!', title: 'sfz', previewAbc: buildSymbolPreviewAbc('!sfz!C2 |]') },
+            { token: '!crescendo(!', title: 'Start crescendo', previewAbc: buildSymbolPreviewAbc('!crescendo(!C D E !crescendo)!F |]') },
+            { token: '!<(!', title: 'Same as !crescendo(!', previewAbc: buildSymbolPreviewAbc('!<(!C D E !<)!F |]') },
+            { token: '!crescendo)!', title: 'End crescendo', previewAbc: buildSymbolPreviewAbc('!crescendo(!C D E !crescendo)!F |]') },
+            { token: '!<)!', title: 'Same as !crescendo)!', previewAbc: buildSymbolPreviewAbc('!<(!C D E !<)!F |]') },
+            { token: '!diminuendo(!', title: 'Start diminuendo', previewAbc: buildSymbolPreviewAbc('!diminuendo(!C D E !diminuendo)!F |]') },
+            { token: '!>(!', title: 'Same as !diminuendo(!', previewAbc: buildSymbolPreviewAbc('!>(!C D E !>)!F |]') },
+            { token: '!diminuendo)!', title: 'End diminuendo', previewAbc: buildSymbolPreviewAbc('!diminuendo(!C D E !diminuendo)!F |]') },
+            { token: '!>)!', title: 'Same as !diminuendo)!', previewAbc: buildSymbolPreviewAbc('!>(!C D E !>)!F |]') },
+
+            { header: 'Navigation' },
+            { token: '!segno!', title: 'Segno', previewAbc: buildSymbolPreviewAbc('!segno!C2 |]') },
+            { token: '!coda!', title: 'Coda', previewAbc: buildSymbolPreviewAbc('!coda!C2 |]') },
+            { token: '!D.S.!', title: 'D.S.', previewAbc: buildSymbolPreviewAbc('!D.S.!C2 |]') },
+            { token: '!D.C.!', title: 'D.C.', previewAbc: buildSymbolPreviewAbc('!D.C.!C2 |]') },
+            { token: '!dacoda!', title: 'Da Coda', previewAbc: buildSymbolPreviewAbc('!dacoda!C2 |]') },
+            { token: '!dacapo!', title: 'Da Capo', previewAbc: buildSymbolPreviewAbc('!dacapo!C2 |]') },
+            { token: '!fine!', title: 'Fine', previewAbc: buildSymbolPreviewAbc('!fine!C2 |]') },
+        ];
+
+        const MiniAbcPreview = ({ abc }) => {
+            const ref = useRef(null);
+
+            useEffect(() => {
+                if (!ref.current) return;
+                ref.current.innerHTML = '';
+
+                if (!window.ABCJS || !abc) return;
+
+                try {
+                    window.ABCJS.renderAbc(ref.current, abc, {
+                        responsive: 'resize',
+                        staffwidth: 112,
+                        paddingtop: 0,
+                        paddingbottom: 0,
+                        paddingleft: 0,
+                        paddingright: 0,
+                        add_classes: false,
+                        scale: 0.75,
+                    });
+                    const svg = ref.current.querySelector('svg');
+                    if (svg) {
+                        svg.style.display = 'block';
+                        svg.style.width = '100%';
+                        svg.style.height = 'auto';
+                    }
+                } catch (err) {
+                    ref.current.innerHTML = '<div style="padding:6px 4px;font-size:11px;color:#64748b;font-family:monospace;">preview</div>';
+                }
+            }, [abc]);
+
+            return (
+                <div className="w-[118px] min-h-[34px] shrink-0 overflow-hidden rounded-md border border-slate-100 bg-white px-1 py-0.5">
+                    <div ref={ref} className="pointer-events-none" />
+                </div>
+            );
+        };
 
         // --- MAIN APP COMPONENT ---
         function App() {
@@ -693,6 +813,8 @@ Tay trai: La3-trang, 7-trang; La3-trang, 7-trang;`;
             const symbolHoldTimerRef = useRef(null);
             const symbolHoldOpenedRef = useRef(false);
             const symbolTapRef = useRef({ last: 0, timer: null });
+            const [repeatQuickToken, setRepeatQuickToken] = useState(':|');
+            const [decoQuickToken, setDecoQuickToken] = useState('!accent!');
 
 
             const closeVoiceMenu = () => setVoiceMenu(v => ({ ...v, visible: false }));
@@ -781,60 +903,117 @@ Tay trai: La3-trang, 7-trang; La3-trang, 7-trang;`;
                 insertSmartText(left);
             };
 
-            const insertCompactToken = (token, options = {}) => {
-                const { trimBefore = false, trimAfter = false } = options || {};
+            const insertPairedToken = (left, right) => {
                 const ta = textAreaRef.current;
-                const start = ta ? (ta.selectionStart ?? cursorPosRef.current) : cursorPosRef.current;
-                const end = ta ? (ta.selectionEnd ?? cursorPosRef.current) : cursorPosRef.current;
-                let before = abcTextRef.current.slice(0, start);
-                let after = abcTextRef.current.slice(end);
-                if (trimBefore) before = before.replace(/[ 	]+$/g, '');
-                if (trimAfter) after = after.replace(/^[ 	]+/g, '');
-                const nextText = before + token + after;
-                const nextPos = before.length + token.length;
-                applyTextChange(nextText, nextPos, { focus: true, skipHistory: false });
-            };
-
-            const wrapSelectionCompact = (left, right) => {
-                const ta = textAreaRef.current;
-                const start = ta ? (ta.selectionStart ?? cursorPosRef.current) : cursorPosRef.current;
-                const end = ta ? (ta.selectionEnd ?? cursorPosRef.current) : cursorPosRef.current;
-                const src = abcTextRef.current;
-                if (start !== end) {
-                    const nextText = src.slice(0, start) + left + src.slice(start, end) + right + src.slice(end);
-                    const nextPos = end + left.length + right.length;
-                    applyTextChange(nextText, nextPos, { focus: true, skipHistory: false });
+                if (!ta) {
+                    insertSmartText(left + right);
                     return;
                 }
-                const nextText = src.slice(0, start) + left + right + src.slice(end);
-                const nextPos = start + left.length;
-                applyTextChange(nextText, nextPos, { focus: true, skipHistory: false });
-            };
 
-            const insertBrokenRhythm = (symbol) => {
-                insertCompactToken(symbol, { trimBefore: true, trimAfter: true });
-            };
+                const start = ta.selectionStart ?? cursorPos;
+                const end = ta.selectionEnd ?? cursorPos;
 
-            const insertRepeatEnding = (ending) => {
-                insertCompactToken(ending, { trimBefore: true, trimAfter: true });
+                if (start !== end) {
+                    wrapSelectionWith(left, right);
+                    return;
+                }
+
+                const newText = abcText.slice(0, start) + left + right + abcText.slice(end);
+                const newPos = start + left.length;
+                applyTextChange(newText, newPos, { focus: true, skipHistory: false });
             };
 
             const insertLyricsLine = () => {
                 const ta = textAreaRef.current;
-                const start = ta ? (ta.selectionStart ?? cursorPosRef.current) : cursorPosRef.current;
-                const src = abcTextRef.current;
-                let before = src.slice(0, start).replace(/[ 	]+$/g, '');
-                const after = src.slice(start);
-                const prefix = before === '' || before.endsWith('\n') ? '' : '\n';
-                const token = `${prefix}w: `;
-                const nextText = before + token + after;
-                const nextPos = before.length + token.length;
-                applyTextChange(nextText, nextPos, { focus: true, skipHistory: false });
+                const pos = ta ? (ta.selectionStart ?? cursorPos) : cursorPos;
+                const src = abcTextRef.current || '';
+                const needsNewLine = pos > 0 && src[pos - 1] !== '\n';
+                insertSmartText((needsNewLine ? '\n' : '') + 'w: ');
             };
 
-            const insertDecorationToken = (token) => {
-                insertCompactToken(token);
+            const runRepeatInsert = (token) => {
+                setRepeatQuickToken(token);
+                insertSmartText(token);
+                closeSymbolMenu();
             };
+
+            const runDecoInsert = (token) => {
+                setDecoQuickToken(token);
+                insertSmartText(token);
+                closeSymbolMenu();
+            };
+
+            const barlineMenuItems = [
+                { label: '||', title: 'Double barline', onClick: () => { insertSmartText('||'); closeSymbolMenu(); } },
+                { label: '|]', title: 'Final barline', onClick: () => { insertSmartText('|]'); closeSymbolMenu(); } },
+                { label: '[|', title: 'Left bracket barline', onClick: () => { insertSmartText('[|'); closeSymbolMenu(); } },
+            ];
+
+            const repeatMenuItems = [
+                { label: '|:', title: 'Repeat start', onClick: () => runRepeatInsert('|:') },
+                { label: ':|', title: 'Repeat end', onClick: () => runRepeatInsert(':|') },
+                { label: '[1', title: 'First ending', onClick: () => runRepeatInsert('[1') },
+                { label: '[2', title: 'Second ending', onClick: () => runRepeatInsert('[2') },
+            ];
+
+            const restMenuItems = [
+                { label: 'z', title: 'Quarter rest', onClick: () => { insertSmartText('z'); closeSymbolMenu(); } },
+                { label: 'z2', title: 'Half rest', onClick: () => { insertSmartText('z2'); closeSymbolMenu(); } },
+                { label: 'z/2', title: 'Eighth rest', onClick: () => { insertSmartText('z/2'); closeSymbolMenu(); } },
+                { label: 'z/4', title: 'Sixteenth rest', onClick: () => { insertSmartText('z/4'); closeSymbolMenu(); } },
+            ];
+
+            const slurMenuItems = [
+                { label: '(', title: 'Open slur', onClick: () => { insertSmartText('('); closeSymbolMenu(); } },
+                { label: ')', title: 'Close slur', onClick: () => { insertSmartText(')'); closeSymbolMenu(); } },
+                { label: '(...)', title: 'Wrap current selection', onClick: () => { wrapSelectionWith('(', ')'); closeSymbolMenu(); } },
+            ];
+
+            const rhythmMenuItems = [
+                { label: '>', title: 'Broken rhythm to the right', onClick: () => { insertSmartText('>'); closeSymbolMenu(); } },
+                { label: '<', title: 'Broken rhythm to the left', onClick: () => { insertSmartText('<'); closeSymbolMenu(); } },
+            ];
+
+            const moreMenuItems = [
+                { label: '{ }', title: 'Grace notes', onClick: () => { insertPairedToken('{', '}'); closeSymbolMenu(); } },
+                { label: 'w:', title: 'Lyrics line', onClick: () => { insertLyricsLine(); closeSymbolMenu(); } },
+            ];
+
+            const tupletMenuItems = TUPLET_MENU_DEFS.map((def) => (
+                def.header
+                    ? { ...def }
+                    : {
+                        ...def,
+                        label: def.token,
+                        onClick: () => {
+                            insertSmartText(def.token);
+                            closeSymbolMenu();
+                        }
+                    }
+            ));
+
+            const decoQuickTokens = ['!accent!', '!fermata!', '!tenuto!', '!trill!', '!p!', '!mf!', '!f!', '!crescendo(!', '!diminuendo(!'];
+            const quickDecorationMenuItems = [
+                { header: 'Quick' },
+                ...decoQuickTokens
+                    .map((token) => DECORATION_MENU_DEFS.find((def) => def.token === token))
+                    .filter(Boolean)
+                    .map((def) => ({
+                        ...def,
+                        label: def.token,
+                        onClick: () => runDecoInsert(def.token),
+                    })),
+                { header: 'All Decorations' },
+                ...DECORATION_MENU_DEFS.map((def) => (
+                    def.header
+                        ? { ...def }
+                        : {
+                            ...def,
+                            label: def.token,
+                            onClick: () => runDecoInsert(def.token),
+                        }
+                )),
+            ];
 
 
 
@@ -5003,142 +5182,104 @@ window.onload=()=>{setTimeout(()=>{window.focus();window.print();},50);}
                                 </div>
 
                                 <div className="flex-1 p-4 overflow-y-auto select-none bg-white">
-                                    <div className="sticky top-0 z-10 -mx-4 px-4 pt-3 pb-4 bg-white border-b border-slate-100 flex flex-wrap gap-2">
-                                        {/* Barline: double-tap to insert | ; hold to choose variants */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: '||', title: 'Vạch kép', onClick: () => { insertSmartText('||'); closeSymbolMenu(); } },
-                                                { label: '|]', title: 'Kết bài', onClick: () => { insertSmartText('|]'); closeSymbolMenu(); } },
-                                                { label: '|:', title: 'Bắt đầu lặp', onClick: () => { insertSmartText('|:'); closeSymbolMenu(); } },
-                                                { label: ':|', title: 'Kết thúc lặp', onClick: () => { insertSmartText(':|'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={(e) => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => insertSmartText('|')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Barline: ấn đúp để chèn |, giữ để chọn || |] |: :|"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            |
-                                        </button>
+                                    <div className="sticky top-0 z-10 -mx-4 px-4 pt-3 pb-4 bg-white border-b border-slate-100 overflow-x-auto">
+                                        <div className="flex min-w-max gap-2">
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, barlineMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) insertSmartText('|'); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Barlines: tap |, hold for variants"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                |
+                                            </button>
 
-                                        {/* Rest: double-tap insert rest by current duration; hold choose variants */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: 'z', title: 'Nghỉ đen', onClick: () => { insertSmartText('z'); closeSymbolMenu(); } },
-                                                { label: 'z/2', title: 'Nghỉ móc đơn', onClick: () => { insertSmartText('z/2'); closeSymbolMenu(); } },
-                                                { label: 'z/4', title: 'Nghỉ móc kép', onClick: () => { insertSmartText('z/4'); closeSymbolMenu(); } },
-                                                { label: 'z/8', title: 'Nghỉ móc ba', onClick: () => { insertSmartText('z/8'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => insertRestDefault()); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Nghỉ: ấn đúp để chèn nghỉ theo trường độ, giữ để chọn loại nghỉ"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            z
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, repeatMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) runRepeatInsert(repeatQuickToken); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Repeats and endings: tap recent, hold for menu"
+                                                className="min-w-[48px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                :|
+                                            </button>
 
-                                        {/* Slur: single button only */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: '(', title: 'Mở luyến', onClick: () => { insertSmartText('('); closeSymbolMenu(); } },
-                                                { label: ')', title: 'Đóng luyến', onClick: () => { insertSmartText(')'); closeSymbolMenu(); } },
-                                                { label: '(...)', title: 'Bọc đoạn đã bôi đen', onClick: () => { wrapSelectionWith('(', ')'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => wrapSelectionWith('(', ')')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Luyến: ấn đúp để bọc đoạn (nếu bôi đen) hoặc chèn (, giữ để chọn ( / ) / wrap"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            Slur
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, restMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) insertRestDefault(); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Rests: tap default, hold for variants"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                z
+                                            </button>
 
-                                        {/* Tie */}
-                                        <button
-                                            onClick={() => insertSmartText('-')}
-                                            title="Tie (nối trường độ): -"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            -
-                                        </button>
+                                            <button
+                                                onClick={() => insertSmartText('-')}
+                                                title="Tie"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                -
+                                            </button>
 
-                                        {/* Triplet */}
-                                        <button
-                                            onClick={() => insertSmartText('(3')}
-                                            title="Triplet: (3"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            (3
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, slurMenuItems)}
+                                                onPointerUp={() => {
+                                                    cancelSymbolHold();
+                                                    if (!symbolHoldOpenedRef.current) {
+                                                        const ta = textAreaRef.current;
+                                                        const hasSelection = ta && (ta.selectionStart ?? cursorPos) !== (ta.selectionEnd ?? cursorPos);
+                                                        if (hasSelection) wrapSelectionWith('(', ')');
+                                                        else insertSmartText('(');
+                                                    }
+                                                }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Slurs: tap open/wrap, hold for variants"
+                                                className="min-w-[54px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                {'( )'}
+                                            </button>
 
-                                        {/* Broken rhythm */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: '>', title: 'Broken rhythm >', onClick: () => { insertBrokenRhythm('>'); closeSymbolMenu(); } },
-                                                { label: '<', title: 'Broken rhythm <', onClick: () => { insertBrokenRhythm('<'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => insertBrokenRhythm('>')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Broken rhythm: ấn đúp để chèn >, giữ để chọn > hoặc <"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            &gt;/&lt;
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, rhythmMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) insertSmartText('>'); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Broken rhythm: tap >, hold for > or <"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                &gt;
+                                            </button>
 
-                                        {/* Grace notes */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: '{...}', title: 'Bọc đoạn bằng grace notes', onClick: () => { wrapSelectionCompact('{', '}'); closeSymbolMenu(); } },
-                                                { label: '{', title: 'Mở grace notes', onClick: () => { insertCompactToken('{'); closeSymbolMenu(); } },
-                                                { label: '}', title: 'Đóng grace notes', onClick: () => { insertCompactToken('}'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => wrapSelectionCompact('{', '}')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Grace notes: ấn đúp để bọc đoạn bằng { }, giữ để chọn { / } / wrap"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            {'{ }'}
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, tupletMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) insertSmartText('(3'); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Tuplets: tap (3, hold for more"
+                                                className="min-w-[48px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                (3
+                                            </button>
 
-                                        {/* Repeat endings */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: '[1', title: 'First ending', onClick: () => { insertRepeatEnding('[1'); closeSymbolMenu(); } },
-                                                { label: '[2', title: 'Second ending', onClick: () => { insertRepeatEnding('[2'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => insertRepeatEnding('[1')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Repeat endings: ấn đúp để chèn [1, giữ để chọn [1 hoặc [2"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            [1/[2
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, quickDecorationMenuItems)}
+                                                onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) runDecoInsert(decoQuickToken); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="Decorations: tap recent, hold for menu"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                !
+                                            </button>
 
-                                        {/* Lyrics */}
-                                        <button
-                                            onClick={insertLyricsLine}
-                                            title="Lyrics line: w:"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            w:
-                                        </button>
-
-                                        {/* Decorations */}
-                                        <button
-                                            onPointerDown={(e) => startSymbolHold(e, [
-                                                { label: 'trill', title: '!trill!', onClick: () => { insertDecorationToken('!trill!'); closeSymbolMenu(); } },
-                                                { label: 'fermata', title: '!fermata!', onClick: () => { insertDecorationToken('!fermata!'); closeSymbolMenu(); } },
-                                                { label: 'accent', title: '!accent!', onClick: () => { insertDecorationToken('!accent!'); closeSymbolMenu(); } },
-                                                { label: 'tenuto', title: '!tenuto!', onClick: () => { insertDecorationToken('!tenuto!'); closeSymbolMenu(); } },
-                                                { label: 'p', title: '!p!', onClick: () => { insertDecorationToken('!p!'); closeSymbolMenu(); } },
-                                                { label: 'mf', title: '!mf!', onClick: () => { insertDecorationToken('!mf!'); closeSymbolMenu(); } },
-                                                { label: 'f', title: '!f!', onClick: () => { insertDecorationToken('!f!'); closeSymbolMenu(); } },
-                                            ])}
-                                            onPointerUp={() => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) handleSymbolTapDouble(() => insertDecorationToken('!trill!')); }}
-                                            onPointerLeave={cancelSymbolHold}
-                                            title="Decorations: ấn đúp để chèn !trill!, giữ để chọn trill / fermata / accent / tenuto / p / mf / f"
-                                            className="px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                                        >
-                                            Deco
-                                        </button>
+                                            <button
+                                                onPointerDown={(e) => startSymbolHold(e, moreMenuItems)}
+                                                onPointerUp={(e) => { cancelSymbolHold(); if (!symbolHoldOpenedRef.current) openSymbolMenu(e.clientX, e.clientY, moreMenuItems); }}
+                                                onPointerLeave={cancelSymbolHold}
+                                                title="More symbols"
+                                                className="min-w-[42px] px-3 py-2 bg-slate-50 text-slate-800 border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                            >
+                                                ⋯
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2 pt-4">
@@ -5712,20 +5853,36 @@ window.onload=()=>{setTimeout(()=>{window.focus();window.print();},50);}
 
                     {symbolMenu.visible && (
                         <div
-                            className="fixed z-[9999] bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden text-sm"
-                            style={{ left: symbolMenu.x, top: symbolMenu.y, minWidth: 180 }}
+                            className="fixed z-[9999] bg-white border border-slate-200 rounded-lg shadow-lg text-sm overflow-y-auto"
+                            style={{ left: symbolMenu.x, top: symbolMenu.y, minWidth: symbolMenu.items.some(it => it.previewAbc) ? 360 : 180, maxWidth: 460, maxHeight: '70vh' }}
                             onMouseDown={(e) => e.stopPropagation()}
                         >
                             {symbolMenu.items.map((it, i) => (
-                                <button
-                                    key={i}
-                                    onClick={it.onClick}
-                                    className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between"
-                                    title={it.title}
-                                >
-                                    <span className="font-mono font-semibold">{it.label}</span>
-                                    <span className="text-[11px] text-slate-500 ml-3">{it.title}</span>
-                                </button>
+                                it.header ? (
+                                    <div
+                                        key={i}
+                                        className="px-3 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 bg-slate-50 border-b border-slate-100"
+                                    >
+                                        {it.header}
+                                    </div>
+                                ) : (
+                                    <button
+                                        key={i}
+                                        onClick={it.onClick}
+                                        className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-3 border-b border-slate-100 last:border-b-0"
+                                        title={it.title}
+                                    >
+                                        {it.previewAbc ? (
+                                            <MiniAbcPreview abc={it.previewAbc} />
+                                        ) : (
+                                            <span className="font-mono font-semibold min-w-[64px]">{it.label}</span>
+                                        )}
+                                        <div className="min-w-0">
+                                            <div className="font-mono font-semibold text-slate-800 break-all">{it.label}</div>
+                                            <div className="text-[11px] text-slate-500 mt-0.5">{it.title}</div>
+                                        </div>
+                                    </button>
+                                )
                             ))}
                         </div>
                     )}
