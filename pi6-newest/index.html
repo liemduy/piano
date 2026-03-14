@@ -1,0 +1,411 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Liem Piano Coach</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.2.2/abcjs-basic-min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.2.2/abcjs-audio.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body class="theme-retro">
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-music fa-lg"></i>
+      <div class="title">Liem Piano Coach</div>
+    </div>
+
+    <div class="hdr-main">
+      <div class="header-group header-group--session">
+        <div class="mode-select-wrap" title="Chế độ luyện">
+          <span class="lbl">Chế độ</span>
+          <select id="modeSelect" class="mode-select">
+            <option value="beginner" selected>Đúng nốt</option>
+            <option value="rhythm">Theo BPM</option>
+          </select>
+        </div>
+
+        <div id="midiBadge" class="midi-badge off" title="Bấm để kết nối MIDI">
+          <i class="fa-solid fa-plug"></i><span id="midiText">MIDI tắt</span>
+        </div>
+
+        <div id="metroCluster" class="metroCluster" title="Máy đếm nhịp. Bấm BPM để bật hoặc tắt, dùng ⋯ để mở tùy chọn.">
+          <button id="btnMetro" class="pill ghost metroBtn" title="Bật hoặc tắt máy đếm nhịp">
+            <i class="fa-solid fa-stopwatch"></i>
+            <span class="text-strong">BPM</span>
+            <span id="metroBpm" class="bpm text-strong">80</span>
+          </button>
+
+          <button id="btnMetroMenu" class="pill ghost metroMini" title="Tùy chọn máy đếm nhịp">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+
+          <div id="metroLed" class="metroLed" aria-label="Beat indicator"></div>
+        </div>
+      </div>
+
+      <div class="header-group header-group--view">
+        <button id="btnAutoScroll" class="pill ghost" title="Tự cuộn sheet theo nốt hiện tại"><i class="fa-solid fa-arrows-up-down"></i></button>
+        <button id="btnLoopRange" class="pill ghost" title="Giữ Ctrl/Cmd rồi bấm 2 nốt để khóa đoạn"><i class="fa-solid fa-repeat"></i> Loop đoạn</button>
+      </div>
+    </div>
+
+    <div class="hdr-right">
+      <button id="btnFocusBack" class="pill ghost is-hidden"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+      <button id="btnAppSettings" class="pill ghost appSettingsBtn" title="Cài đặt giao diện và ngôn ngữ" aria-label="Cài đặt giao diện và ngôn ngữ">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Cài đặt</span>
+      </button>
+      <button id="btnInstructions" class="pill ghost" title="Hướng dẫn"><i class="fa-solid fa-circle-info"></i> Hướng dẫn</button>
+
+      <div id="practiceControls" class="practiceControls">
+        <span id="hdrStats" class="hdrStats">—</span>
+        <button id="btnRestartBarHdr" class="pill ghost" title="Về đầu ô nhịp"><i class="fa-solid fa-rotate-left"></i> Ô nhịp</button>
+        <button id="btnStopHdr" class="pill danger" title="Dừng luyện"><i class="fa-solid fa-stop"></i> Dừng</button>
+      </div>
+
+      <button id="btnPractice" class="pill primary"><i class="fa-solid fa-play"></i> Luyện</button>
+    </div>
+  </header>
+
+  <!-- Metronome Popover -->
+  <div id="metroBackdrop" class="backdrop"></div>
+  <div id="metroPopover" class="metroPopover" role="dialog" aria-label="Tùy chọn máy đếm nhịp">
+    <div class="metroPopHead">
+      <div class="metroPopTitle"><i class="fa-solid fa-stopwatch"></i> Máy đếm nhịp</div>
+      <button id="btnMetroPopClose" class="iconBtn" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="metroPopGrid">
+      <div class="metroPopRow">
+        <div class="lbl">Chia nhịp</div>
+        <select id="metroSubdiv" class="metroSelect compact" title="Chia nhịp">
+          <option value="1">1/4</option>
+          <option value="2">1/8</option>
+          <option value="4">1/16</option>
+        </select>
+      </div>
+
+      <div class="metroPopRow">
+        <div class="lbl">Âm tick</div>
+        <div class="rowInline">
+          <button id="btnMetroTick" class="pill ghost metroMini" title="Bật hoặc tắt âm tick">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+          <select id="metroSound" class="metroSelect" title="Âm tick">
+            <option value="click">Click</option>
+            <option value="beep">Beep</option>
+            <option value="wood">Wood</option>
+            <option value="hihat">HiHat</option>
+            <option value="clave">Clave</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="metroPopRow">
+        <div class="lbl">Nháy</div>
+        <button id="btnMetroFlash" class="pill ghost metroMini" title="Bật hoặc tắt nháy">
+          <i class="fa-solid fa-bolt"></i>
+        </button>
+      </div>
+
+      <div class="metroPopRow">
+        <div class="lbl">Nhấn mạnh</div>
+        <div class="rowInline">
+          <button id="btnMetroAccent" class="pill ghost metroMini" title="Nhấn mạnh phách 1">
+            <i class="fa-solid fa-star"></i>
+          </button>
+          <select id="metroAccentSound" class="metroSelect" title="Âm nhấn phách 1">
+            <option value="wood">Wood</option>
+            <option value="click">Click</option>
+            <option value="beep">Beep</option>
+            <option value="hihat">HiHat</option>
+            <option value="clave">Clave</option>
+            <option value="random">Random</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="hint">
+        Bấm <b>BPM</b> trên header để bật hoặc tắt. Nhịp và BPM luôn đồng bộ với bài. Ở chế độ <b>Theo BPM</b>, khi bắt đầu luyện thì timeline sẽ được canh lại để phách 1 khớp đúng.
+      </div>
+    </div>
+  </div>
+
+  <!-- App Settings Popover -->
+  <div id="appSettingsBackdrop" class="backdrop"></div>
+  <div id="appSettingsPopover" class="appSettingsPopover" role="dialog" aria-label="Cài đặt giao diện và ngôn ngữ">
+    <div class="metroPopHead appSettingsHead">
+      <div class="metroPopTitle"><i class="fa-solid fa-sliders"></i> Cài đặt app</div>
+      <button id="btnAppSettingsClose" class="iconBtn" title="Đóng"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="appSettingsGrid">
+      <div class="displayField appSettingsField">
+        <label id="labelTheme" for="themeSel">Giao diện</label>
+        <select id="themeSel">
+          <option value="retro" selected>Retro</option>
+          <option value="ocean">Ocean</option>
+          <option value="coder">Coder</option>
+        </select>
+      </div>
+
+      <div class="displayField appSettingsField">
+        <label id="labelLanguage" for="languageSel">Ngôn ngữ</label>
+        <select id="languageSel">
+          <option value="vi" selected>Tiếng Việt</option>
+          <option value="en-US">English (US)</option>
+          <option value="jpn">日本語</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <div id="app">
+    <div id="main">
+      <aside id="abcPanel">
+        <div class="tabs">
+          <div class="tab-left">
+            <button id="tab-abc" class="tab active"><i class="fa-solid fa-code"></i> ABC</button>
+            <button id="tab-recent" class="tab"><i class="fa-solid fa-clock-rotate-left"></i> Gần đây</button>
+          </div>
+          <div class="inline-cluster">
+            <button id="btnCopyAbc" class="mini" title="Chép ABC vào clipboard"><i class="fa-solid fa-copy"></i> Chép ABC</button>
+            <button id="btnSave" class="mini primary" title="Lưu cục bộ"><i class="fa-solid fa-bookmark"></i> Lưu</button>
+          </div>
+        </div>
+
+        <div id="abcContent">
+          <textarea id="abcInput" spellcheck="false"></textarea>
+          <div id="recentList" class="is-hidden"></div>
+        </div>
+
+        <div class="panel-footer">
+          <div class="btn-row">
+            <button id="btnRender" class="mini"><i class="fa-solid fa-wand-magic-sparkles"></i> Render</button>
+            <button id="btnPrevPlayPause" class="mini" title="Nghe hoặc tạm dừng nghe thử"><i class="fa-solid fa-play"></i> Nghe</button>
+            <button id="btnPrevStop" class="mini" title="Dừng nghe thử" disabled><i class="fa-solid fa-stop"></i></button>
+            <button id="btnReset" class="mini" title="Trả về bài mẫu"><i class="fa-solid fa-rotate-left"></i></button>
+          </div>
+          <div class="local-status">
+            <span class="local-status-label">Cục bộ</span>
+            <i class="fa-solid fa-database local-status-icon"></i>
+          </div>
+        </div>
+      </aside>
+
+      <section id="sheetPanel">
+        <div id="sheetTop">
+          <div class="sheetTopPrimary">
+            <button id="btnToggleEditor" class="sheetPanelToggle" type="button" title="Thu gọn khung ABC" aria-label="Thu gọn khung ABC" aria-controls="abcPanel" aria-expanded="true">&lt;</button>
+            <div id="songMeta">
+              <div id="songTitle">—</div>
+              <div id="songSub">Dán ABC → Render → Luyện (mặc định: Đúng nốt)</div>
+              <div id="songLoopSub" class="songLoopSub">Tắt loop • Ctrl/Cmd + bấm 2 nốt để khóa đoạn</div>
+            </div>
+
+            <div id="coachStrip" class="coachStrip">
+                <div class="coachRow">
+                  <div class="coachInline"><span class="lab">BƯỚC</span><span class="val" id="coachStep">—</span></div>
+                  <div class="coachInline"><span class="lab">CHƠI</span><span class="val" id="coachPlay">—</span></div>
+                </div>
+                <div class="coachRow">
+                  <div class="coachInline"><span class="lab">THIẾU</span><span class="val" id="coachMiss">—</span></div>
+                  <div class="coachInline"><span class="lab">THỪA</span><span class="val" id="coachExtra">—</span></div>
+                </div>
+                <div class="coachRow">
+                  <div class="coachInline"><span class="lab">NHỊP</span><span class="val" id="coachTime">—</span></div>
+                  <div class="coachInline"><span class="lab">CHẤT</span><span class="val" id="coachQual">—</span></div>
+                </div>
+            </div>
+          </div>
+
+          <div id="sheetTopActions">
+            <div id="zoomCtrl" class="ctrl zoomCtrl">
+              <label for="zoomRange">Thu phóng</label>
+              <input id="zoomRange" type="range" min="70" max="140" value="100"/>
+            </div>
+          </div>
+        </div>
+
+        <div id="sheetWrap">
+          <div id="paper"></div>
+          <div id="noteTooltip" class="noteTooltip"></div>
+        </div>
+
+        <div id="bottomBar">
+          <div class="bar-section">
+            <div class="ctrl">
+              <label>BPM</label>
+              <input id="bpmRange" type="range" min="40" max="160" value="80"/>
+              <span id="bpmVal" class="range-value">80</span>
+            </div>
+          </div>
+
+          <div class="bar-section">
+            <div class="ctrl">
+              <label id="labelCountIn">Đếm vào</label>
+              <select id="countInSel">
+                <option value="0">0 ô</option>
+                <option value="1">1 ô</option>
+                <option value="2" selected>2 ô</option>
+              </select>
+
+              <div id="toleranceCtrl" class="inline-cluster">
+                <label id="labelTolerance" class="label-offset">Độ lệch</label>
+                <select id="tolSel">
+                  <option value="240">Rộng</option>
+                  <option value="160" selected>Bình thường</option>
+                  <option value="90">Chặt</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- MIDI Modal -->
+  <div id="midiModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Kết nối MIDI</h2>
+      <p>Chọn thiết bị MIDI input. (WebMIDI hoạt động tốt trên Chrome/Edge.)</p>
+      <div class="row">
+        <div class="grow">
+          <label class="field-label">Nguồn MIDI</label>
+          <select id="midiSelect" class="field-select-full"></select>
+        </div>
+        <button id="btnRefreshMidi" class="mini"><i class="fa-solid fa-rotate"></i> Làm mới</button>
+      </div>
+      <div class="footer">
+        <button id="btnMidiClose" class="mini">Đóng</button>
+        <button id="btnMidiConnect" class="mini primary"><i class="fa-solid fa-plug-circle-check"></i> Kết nối</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Practice Result Modal -->
+  <div id="resultModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Kết quả luyện</h2>
+      <p id="resultSub">—</p>
+      <div class="row" id="resultBody"></div>
+      <div class="footer">
+        <button id="btnResultClose" class="mini">Quay lại</button>
+        <button id="btnResultAgain" class="mini primary"><i class="fa-solid fa-rotate-right"></i> Luyện lại</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Instructions Modal -->
+  <div id="instrModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>Hướng dẫn</h2>
+      <p>Dán ABC → Render → chọn 1 trong 2 chế độ → Luyện. Nếu muốn khóa một đoạn, giữ <b>Ctrl/Cmd</b> rồi bấm 2 nốt để bật <b>Loop đoạn</b>.</p>
+
+      <div class="instr-stack">
+        <div class="instr-callout">
+          <div class="hint-title">Luồng dùng nhanh</div>
+          <ol class="instr-list">
+            <li>Dán hoặc sửa ABC ở panel trái.</li>
+            <li>Ấn <b>Render</b> để cập nhật sheet nhạc.</li>
+            <li>Chọn <b>Đúng nốt</b> hoặc <b>Theo BPM</b> ở menu trên header.</li>
+            <li>Kết nối MIDI nếu muốn chấm trực tiếp từ đàn.</li>
+            <li>Ấn <b>Luyện</b> để bắt đầu luyện.</li>
+          </ol>
+        </div>
+
+        <details class="instrItem" open>
+          <summary>
+            <div>
+              <div>Đúng nốt</div>
+              <div class="sumSub">Đúng nốt rồi mới qua step tiếp theo.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Dùng khi muốn học đọc nốt và vị trí tay thật chắc. App sẽ đứng lại ở step hiện tại cho tới khi bạn bấm đúng nốt cần chơi.
+            <ul>
+              <li>Nốt đơn: đúng mới qua step tiếp theo.</li>
+              <li>Hợp âm: cần đủ nốt; nếu lệch nhẹ vẫn có thể qua nhưng sẽ bị tính là chưa đẹp.</li>
+              <li>Bấm sai nốt: note hiện tại highlight đỏ và bạn phải sửa đúng mới đi tiếp.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Theo BPM</div>
+              <div class="sumSub">Timeline chạy theo BPM, app không chờ bạn.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            Dùng khi muốn luyện timing thật với metronome. Timeline sẽ tiếp tục chạy theo BPM hiện tại dù bạn chơi đúng hay sai.
+            <ul>
+              <li>Đúng pitch trong cửa sổ timing: step được tính đúng.</li>
+              <li>Sai pitch hoặc bấm lệch cửa sổ timing: note hiện tại highlight đỏ.</li>
+              <li>Hết cửa sổ mà chưa chơi đúng: app tính miss và tiếp tục theo timeline.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="instrItem">
+          <summary>
+            <div>
+              <div>Loop đoạn & thao tác nhanh</div>
+              <div class="sumSub">Khóa một đoạn để chỉ luyện / phát đúng đoạn đó.</div>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+          </summary>
+          <div class="instrBody">
+            <ul>
+              <li>Giữ <b>Ctrl/Cmd</b> rồi bấm nốt thứ nhất, sau đó bấm nốt thứ hai để tạo loop.</li>
+              <li>App sẽ lấy theo <b>step thời gian</b>, nên nếu cùng thời điểm có nốt song song ở tay còn lại thì nó cũng được tính vào range.</li>
+              <li>Khi loop đang bật, <b>Nghe</b> sẽ phát lặp đúng đoạn đó và <b>Luyện</b> chỉ chấm trong đoạn đó.</li>
+              <li>Ấn nút <b>Loop đoạn</b> một lần nữa để tắt loop.</li>
+              <li><b>R</b>: về đầu phần hiện tại • <b>Chép ABC</b>: chép nhanh toàn bộ ABC • <b>Lưu</b>: lưu cục bộ.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+      <div class="footer">
+        <button id="btnInstrClose" class="mini primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Outlet -->
+  <div id="toast-container"></div>
+
+  <script src="assets/js/dom.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/abc.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/practice.js"></script>
+  <script src="assets/js/metronome.js"></script>
+  <script src="assets/js/midi.js"></script>
+  <script src="assets/js/preview.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
+

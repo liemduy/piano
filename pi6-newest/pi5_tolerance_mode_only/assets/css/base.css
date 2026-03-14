@@ -1,0 +1,27 @@
+/* Base element defaults. */
+
+* { box-sizing:border-box; }
+html,body { height:100%; }
+body {
+  margin:0; font-family:"Noto Sans","Noto Sans JP",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  display:flex; flex-direction:column;
+  background:var(--bg-app); color:var(--text); overflow:hidden;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+button,input,select,textarea,option{ font:inherit; }
+button,select,input,textarea{ transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 160ms ease, transform 140ms ease; }
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible{
+  outline:none;
+  box-shadow: var(--focus-ring);
+}
+input[type="range"]{ accent-color:var(--primary); }
+::selection{ background:var(--primary-soft); color:var(--text); }
+
+body[data-language="jpn"]{
+  letter-spacing: 0;
+}
