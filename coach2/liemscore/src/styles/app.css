@@ -1,0 +1,143 @@
+/* --- THEMES (from liem_piano_coach.html) --- */
+        :root {
+            --bg-app: #f3f4f6; --bg-panel: #ffffff; --text: #111827; --text-light:#6b7280;
+            --primary:#2563eb; --accent:#10b981; --danger:#ef4444; --warn:#f59e0b;
+            --border:#e5e7eb; --shadow: 0 18px 45px rgba(15, 23, 42, 0.12), 0 6px 18px rgba(15, 23, 42, 0.10);
+            --radius: 14px;
+        }
+        body.theme-retro { --bg-app:#e8e4d9; --bg-panel:#fdf6e3; --text:#5c4b37; --text-light:#7a6a56; --primary:#b58900; --accent:#cb4b16; --border:#e2d7c4; }
+        body.theme-ocean { --bg-app:#e0f7fa; --bg-panel:#ffffff; --text:#006064; --text-light:#3b7f86; --primary:#0288d1; --accent:#00bfa5; --border:#cfe8ec; }
+        body.theme-coder { --bg-app:#0d1117; --bg-panel:#161b22; --text:#c9d1d9; --text-light:#8b949e; --primary:#58a6ff; --accent:#238636; --border:#30363d; }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: var(--bg-app) !important;
+            color: var(--text) !important;
+            overflow: hidden;
+        }
+
+        /* QuickScore theme bridge (convert Tailwind colors → CSS vars) */
+        .qs-app { color: var(--text); }
+        .qs-app .bg-white { background: var(--bg-panel) !important; }
+        .qs-app .bg-slate-50, .qs-app .bg-slate-100 { background: rgba(0,0,0,0.03) !important; }
+        body.theme-coder .qs-app .bg-slate-50, body.theme-coder .qs-app .bg-slate-100 { background: rgba(255,255,255,0.06) !important; }
+
+        /* Tailwind arbitrary color used in preview container */
+        .qs-app .bg-\[\#F8FAFC\] { background: rgba(0,0,0,0.02) !important; }
+        body.theme-coder .qs-app .bg-\[\#F8FAFC\] { background: rgba(255,255,255,0.04) !important; }
+
+        .qs-app .border-slate-100,
+        .qs-app .border-slate-200,
+        .qs-app .border-slate-300,
+        .qs-app .border-slate-200 { border-color: var(--border) !important; }
+
+        .qs-app .text-slate-900,
+        .qs-app .text-slate-800,
+        .qs-app .text-slate-700 { color: var(--text) !important; }
+        .qs-app .text-slate-600,
+        .qs-app .text-slate-500,
+        .qs-app .text-slate-400 { color: var(--text-light) !important; }
+
+        /* Map indigo brand to theme primary */
+        .qs-app .bg-indigo-600 { background-color: var(--primary) !important; }
+        .qs-app .text-indigo-700,
+        .qs-app .text-indigo-600,
+        .qs-app .text-indigo-500 { color: var(--primary) !important; }
+        .qs-app .bg-indigo-50 { background-color: rgba(37,99,235,0.10) !important; }
+        body.theme-coder .qs-app .bg-indigo-50 { background-color: rgba(88,166,255,0.14) !important; }
+        body.theme-retro .qs-app .bg-indigo-50 { background-color: rgba(181,137,0,0.14) !important; }
+        body.theme-ocean .qs-app .bg-indigo-50 { background-color: rgba(2,136,209,0.12) !important; }
+
+        /* Make cards feel lighter + roomier */
+        .qs-app .rounded-xl { border-radius: var(--radius) !important; }
+        .qs-app .rounded-2xl { border-radius: calc(var(--radius) + 6px) !important; }
+        .qs-app .shadow-sm, .qs-app .shadow-md, .qs-app .shadow-lg, .qs-app .shadow-2xl { box-shadow: var(--shadow) !important; }
+
+        /* Slightly nicer focus ring */
+        .qs-app *:focus { outline: none; }
+        .qs-app input:focus, .qs-app select:focus, .qs-app textarea:focus, .qs-app button:focus {
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+            border-color: rgba(37, 99, 235, 0.35) !important;
+        }
+        body.theme-retro .qs-app input:focus, body.theme-retro .qs-app select:focus, body.theme-retro .qs-app textarea:focus, body.theme-retro .qs-app button:focus {
+            box-shadow: 0 0 0 4px rgba(181, 137, 0, 0.18);
+            border-color: rgba(181, 137, 0, 0.45) !important;
+        }
+        body.theme-ocean .qs-app input:focus, body.theme-ocean .qs-app select:focus, body.theme-ocean .qs-app textarea:focus, body.theme-ocean .qs-app button:focus {
+            box-shadow: 0 0 0 4px rgba(2, 136, 209, 0.16);
+            border-color: rgba(2, 136, 209, 0.45) !important;
+        }
+        body.theme-coder .qs-app input:focus, body.theme-coder .qs-app select:focus, body.theme-coder .qs-app textarea:focus, body.theme-coder .qs-app button:focus {
+            box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.20);
+            border-color: rgba(88, 166, 255, 0.55) !important;
+        }
+
+        /* Softer hover for primary buttons (tailwind hover:bg-indigo-700) */
+        .qs-app .hover\:bg-indigo-700:hover { filter: brightness(0.95); }
+        .qs-app .hover\:bg-indigo-100:hover { filter: brightness(0.98); }
+
+/* ABCJS rendering polish */
+        .abcjs-wrap svg { width: 100% !important; height: auto !important; display: block; }
+        .abcjs-wrap svg * { shape-rendering: geometricPrecision; }
+
+        /* Playback highlight */
+        .abcjs-wrap .note-played path,
+        .abcjs-wrap .note-played text,
+        .abcjs-wrap .note-played {
+            fill: var(--accent) !important;
+            stroke: var(--accent) !important;
+            opacity: 1 !important;
+        }
+        .abcjs-wrap .note-current path,
+        .abcjs-wrap .note-current text,
+        .abcjs-wrap .note-current {
+            fill: var(--primary) !important;
+            stroke: var(--primary) !important;
+            opacity: 1 !important;
+        }
+
+        .abcjs-wrap .note-range path,
+        .abcjs-wrap .note-range text,
+        .abcjs-wrap .note-range {
+            fill: rgba(37, 99, 235, 0.54);
+            stroke: rgba(37, 99, 235, 0.54);
+            opacity: 0.74;
+        }
+        body.theme-coder .abcjs-wrap .note-range path,
+        body.theme-coder .abcjs-wrap .note-range text,
+        body.theme-coder .abcjs-wrap .note-range {
+            fill: #67e8f9 !important;
+            stroke: #67e8f9 !important;
+            opacity: 0.96 !important;
+        }
+        .abcjs-wrap .note-range-start path,
+        .abcjs-wrap .note-range-start text,
+        .abcjs-wrap .note-range-start {
+            fill: #f59e0b;
+            stroke: #f59e0b;
+            opacity: 0.98;
+        }
+        .abcjs-wrap .note-range-start-peer path,
+        .abcjs-wrap .note-range-start-peer text,
+        .abcjs-wrap .note-range-start-peer {
+            fill: #fbbf24;
+            stroke: #fbbf24;
+            opacity: 0.84;
+        }
+        .abcjs-wrap .note-range-end path,
+        .abcjs-wrap .note-range-end text,
+        .abcjs-wrap .note-range-end {
+            fill: #ef4444;
+            stroke: #ef4444;
+            opacity: 0.98;
+        }
+        .abcjs-wrap .note-range-end-peer path,
+        .abcjs-wrap .note-range-end-peer text,
+        .abcjs-wrap .note-range-end-peer {
+            fill: #fb7185;
+            stroke: #fb7185;
+            opacity: 0.84;
+        }
