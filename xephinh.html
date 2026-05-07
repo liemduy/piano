@@ -61,7 +61,7 @@
       background: radial-gradient(circle at top, var(--bg1), var(--bg2) 80%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      touch-action: none; /* Chặn zoom/scroll trên mobile */
+      touch-action: none;
     }
 
     /* Layout chính */
@@ -75,21 +75,21 @@
       padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
     }
 
-    /* Khu vực Canvas */
+    /* Khu vực Canvas (Chiếm ~80%) */
     .game-section {
-      flex: 1;
-      min-height: 0;
+      flex: 1; /* Ưu tiên chiếm toàn bộ không gian còn lại */
       display: flex;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center; /* Căn giữa màn hình chơi */
       position: relative;
-      padding: 10px;
+      padding: max(10px, var(--safe-top)) 10px 10px 10px;
     }
 
     canvas {
       height: 100%;
       max-height: 100%;
       width: auto;
+      max-width: 100%;
       aspect-ratio: 1 / 2;
       background: rgba(0, 0, 0, 0.5);
       border-radius: 6px;
@@ -97,12 +97,12 @@
       border: 1px solid var(--card-border);
     }
 
-    /* HUD (Hiển thị điểm số đè lên Game) */
+    /* HUD (Hiển thị điểm số) */
     .hud {
       position: absolute;
-      top: 15px;
-      left: 15px;
-      right: 15px;
+      top: max(10px, var(--safe-top));
+      left: 10px;
+      right: 10px;
       display: flex;
       justify-content: space-between;
       pointer-events: none;
@@ -113,16 +113,16 @@
       background: rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
 
     .hud-label {
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 800;
       color: var(--text-muted);
       letter-spacing: 0.5px;
@@ -130,7 +130,7 @@
     }
 
     .hud-value {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 900;
       font-variant-numeric: tabular-nums;
       color: var(--accent);
@@ -138,30 +138,34 @@
 
     .status-chip {
       background: rgba(0, 0, 0, 0.65);
-      padding: 6px 12px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 800;
       color: white;
       border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      height: fit-content;
+      margin-top: 5px;
     }
 
-    /* Khu vực điều khiển */
+    /* Khu vực điều khiển (Chiếm cứng 20%) */
     .controls-section {
-      height: clamp(200px, 32vh, 280px); /* Tăng chiều cao để nút to hơn */
+      flex: 0 0 22%; /* Chiếm khoảng 20-22% */
+      min-height: 135px; /* Giới hạn tối thiểu để nút không bị nhỏ xíu */
+      max-height: 180px; 
       display: grid;
-      grid-template-columns: 1fr 1.2fr 1fr;
-      gap: 8px;
-      padding: 5px 10px 15px 10px;
+      grid-template-columns: 1fr 1.3fr 1fr;
+      gap: 6px;
+      padding: 0 8px 12px 8px;
     }
 
     .panel {
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 6px;
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -170,11 +174,11 @@
     }
 
     .panel-title {
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 800;
       color: var(--text-muted);
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       letter-spacing: 1px;
     }
 
@@ -184,14 +188,14 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      gap: 4px;
+      gap: 3px;
       align-items: stretch;
     }
 
     .btn {
       background: var(--card-border);
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       color: var(--text);
       font-weight: bold;
       display: flex;
@@ -206,7 +210,7 @@
       background: var(--card-active);
     }
 
-    .btn-move { font-size: 20px; }
+    .btn-move { font-size: 16px; }
     .btn.up { grid-column: 2; grid-row: 1; }
     .btn.left { grid-column: 1; grid-row: 2; }
     .btn.down { grid-column: 2; grid-row: 3; }
@@ -218,12 +222,12 @@
       display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 10px;
+      gap: 6px;
     }
 
     .btn-action {
-      font-size: 24px;
-      border-radius: 12px;
+      font-size: 20px;
+      border-radius: 10px;
       font-weight: 900;
     }
 
@@ -233,19 +237,19 @@
     .btn-a:active { background: var(--accent); filter: brightness(1.2); }
     .btn-b:active { background: var(--danger); filter: brightness(1.2); }
 
-    /* Center Settings Panel */
+    /* Center Settings Panel - Ép chặt lại */
     .settings-container {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      overflow-y: auto;
+      gap: 4px;
+      overflow: hidden;
     }
 
     .setting-row {
       background: rgba(0,0,0,0.15);
-      border-radius: 8px;
-      padding: 6px 8px;
+      border-radius: 6px;
+      padding: 4px 6px;
     }
 
     body[data-mode="light"] .setting-row {
@@ -255,10 +259,10 @@
     .setting-label {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 700;
       color: var(--text-muted);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .setting-value { color: var(--text); }
@@ -266,20 +270,20 @@
     input[type=range] {
       width: 100%;
       accent-color: var(--accent);
-      height: 4px;
-      margin: 5px 0;
+      height: 2px;
+      margin: 2px 0;
     }
 
     .next-ai-row {
       display: flex;
-      gap: 6px;
-      height: 40px;
+      gap: 4px;
+      height: 32px;
     }
 
     .next-box, .ai-btn-wrap {
       flex: 1;
       background: rgba(0,0,0,0.15);
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -287,35 +291,35 @@
 
     .next-piece {
       display: grid;
-      grid-template-columns: repeat(4, 8px);
-      grid-auto-rows: 8px;
+      grid-template-columns: repeat(4, 7px);
+      grid-auto-rows: 7px;
       gap: 1px;
     }
-    .next-cell { width: 8px; height: 8px; border-radius: 2px; }
+    .next-cell { width: 7px; height: 7px; border-radius: 1px; }
 
     .btn-ai {
       width: 100%;
       height: 100%;
       background: var(--accent);
       color: #000;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 900;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     .btn-ai.off { background: var(--danger); color: #fff; }
 
     .theme-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      gap: 3px;
       margin-top: auto;
     }
 
     .btn-theme {
-      font-size: 9px;
-      padding: 6px 0;
-      border-radius: 6px;
+      font-size: 8px;
+      padding: 4px 0;
+      border-radius: 4px;
       background: var(--card-border);
     }
     .btn-theme.active {
@@ -324,28 +328,27 @@
     }
     
     .btn-mode {
-      margin-top: 4px;
-      font-size: 10px;
-      padding: 6px;
+      margin-top: 3px;
+      font-size: 9px;
+      padding: 4px;
       width: 100%;
-      border-radius: 6px;
+      border-radius: 4px;
     }
 
     /* Responsive cho màn hình ngang (Landscape) */
     @media (orientation: landscape) and (max-height: 500px) {
-      .app {
-        flex-direction: row;
-      }
+      .app { flex-direction: row; }
       .controls-section {
+        flex: 0 0 300px; /* Cố định width thay vì height */
         height: 100%;
-        width: 320px;
+        max-height: none;
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
         overflow-y: auto;
       }
       .panel-title { display: none; }
-      .dpad-container { height: 140px; }
-      .action-container { height: 100px; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+      .dpad-container { height: 120px; }
+      .action-container { height: 90px; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
     }
 
   </style>
@@ -353,7 +356,7 @@
 <body data-mode="dark" data-theme="neon">
 
   <main class="app">
-    <!-- Game Canvas & HUD -->
+    <!-- Game Canvas & HUD (~80%) -->
     <section class="game-section">
       <div class="hud">
         <div class="hud-box">
@@ -369,7 +372,7 @@
       <canvas id="game"></canvas>
     </section>
 
-    <!-- Controls -->
+    <!-- Controls (~20%) -->
     <section class="controls-section">
       
       <!-- L Panel: Move -->
@@ -384,7 +387,7 @@
       </div>
 
       <!-- C Panel: Stats & Settings -->
-      <div class="panel" style="padding: 6px;">
+      <div class="panel" style="padding: 4px;">
         <div class="settings-container">
           <div class="next-ai-row">
             <div class="next-box"><div id="nextPiece" class="next-piece"></div></div>
@@ -610,7 +613,7 @@ function placeAndClear(b, shape, px, py, type) {
   return cleared;
 }
 
-// AI Evaluation (Giữ nguyên logic gốc)
+// AI Evaluation
 function getColumnHeights(b) { const heights = Array(W).fill(0); for(let x=0;x<W;x++){for(let y=0;y<H;y++){if(b[y][x]){heights[x]=H-y;break;}}} return heights; }
 function getMaxHeight(b) { return Math.max(...getColumnHeights(b)); }
 function countHoles(b) { let holes=0; for(let x=0;x<W;x++){let seen=false; for(let y=0;y<H;y++){if(b[y][x])seen=true; else if(seen)holes++;}} return holes; }
