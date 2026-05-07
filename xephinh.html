@@ -26,6 +26,8 @@
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-left: env(safe-area-inset-left, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
+      --controls-h: clamp(150px, 21vh, 176px);
+      --app-gap: 4px;
     }
 
     body[data-mode="light"] {
@@ -64,14 +66,24 @@
       width: 100vw;
       height: var(--app-h);
       display: grid;
-      grid-template-rows: minmax(0, 1fr) clamp(150px, 21vh, 176px);
-      gap: 4px;
+      grid-template-rows: minmax(0, 1fr) var(--controls-h);
+      gap: var(--app-gap);
       padding:
         max(1px, var(--safe-top))
         max(1px, var(--safe-right))
         max(1px, var(--safe-bottom))
         max(1px, var(--safe-left));
       overflow: hidden;
+    }
+
+    .app.controls-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .app.controls-collapsed .controls-wrap {
+      display: none;
     }
 
     .game-wrap {
@@ -115,6 +127,38 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .control-toggle {
+      position: absolute;
+      top: max(8px, calc(var(--safe-top) + 6px));
+      right: max(8px, calc(var(--safe-right) + 6px));
+      z-index: 5;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.34);
+      color: white;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 18px rgba(0,0,0,0.18);
+      backdrop-filter: blur(12px);
+      font-size: 22px;
+      font-weight: 1000;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .control-toggle:active {
+      transform: scale(0.94);
+      filter: brightness(1.12);
+    }
+
+    .app.controls-collapsed .control-toggle {
+      background: var(--accent);
+      color: #06111a;
     }
 
     .controls-wrap {
@@ -349,8 +393,12 @@
     }
 
     @media (max-height: 720px) {
+      :root {
+        --controls-h: clamp(146px, 23vh, 158px);
+      }
+
       .app {
-        grid-template-rows: minmax(0, 1fr) clamp(146px, 23vh, 158px);
+        grid-template-rows: minmax(0, 1fr) var(--controls-h);
       }
 
       .dpad {
@@ -375,6 +423,10 @@
         grid-template-rows: minmax(0, 1fr);
       }
 
+      .app.controls-collapsed {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .controls-wrap {
         grid-template-columns: minmax(80px, 0.85fr) minmax(150px, 1.35fr) minmax(80px, 0.85fr);
         min-height: 0;
@@ -388,7 +440,7 @@
   </style>
 </head>
 <body data-mode="dark" data-theme="neon">
-  <main class="app">
+  <main class="app" id="app">
     <section class="game-wrap">
       <canvas id="game"></canvas>
       <div class="overlay-chip" id="statusChip">AI ACTIVE</div>
@@ -448,9 +500,12 @@
         </div>
       </div>
     </section>
+
+    <button id="controlToggleBtn" class="control-toggle" type="button" aria-label="Collapse controls" aria-expanded="true">▾</button>
   </main>
 
 <script>
+const app = document.getElementById("app");
 const canvas = document.getElementById("game");
 const gameWrap = document.querySelector(".game-wrap");
 const ctx = canvas.getContext("2d");
@@ -478,6 +533,7 @@ const nextPiece = document.getElementById("nextPiece");
 const modeBtn = document.getElementById("modeBtn");
 const aiToggleBtn = document.getElementById("aiToggleBtn");
 const statusChip = document.getElementById("statusChip");
+const controlToggleBtn = document.getElementById("controlToggleBtn");
 const themeButtons = [...document.querySelectorAll(".theme-btn")];
 
 let visualTheme = "neon";
@@ -485,6 +541,7 @@ let visualMode = "dark";
 let speedFactor = 1;
 let riskFactor = 1;
 let aiEnabled = true;
+let controlsCollapsed = false;
 let paused = false;
 let lastTapAt = 0;
 let lastTapX = 0;
@@ -521,6 +578,15 @@ window.addEventListener("orientationchange", updateViewportLayout);
 
 if ("ResizeObserver" in window) {
   new ResizeObserver(syncCanvasDisplaySize).observe(gameWrap);
+}
+
+function setControlsCollapsed(collapsed) {
+  controlsCollapsed = collapsed;
+  app.classList.toggle("controls-collapsed", controlsCollapsed);
+  controlToggleBtn.textContent = controlsCollapsed ? "▴" : "▾";
+  controlToggleBtn.setAttribute("aria-expanded", String(!controlsCollapsed));
+  controlToggleBtn.setAttribute("aria-label", controlsCollapsed ? "Expand controls" : "Collapse controls");
+  requestAnimationFrame(syncCanvasDisplaySize);
 }
 const THEME_PRESETS = {
   neon: {
@@ -567,6 +633,10 @@ themeButtons.forEach(btn => {
     document.body.dataset.theme = visualTheme;
     themeButtons.forEach(x => x.classList.toggle("active", x === btn));
   });
+});
+
+controlToggleBtn.addEventListener("click", () => {
+  setControlsCollapsed(!controlsCollapsed);
 });
 
 modeBtn.addEventListener("click", () => {
