@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#060814" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AI Tetris" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
   <title>AI Tetris Mobile Compact</title>
   <style>
     * {
@@ -546,6 +553,7 @@ let paused = false;
 let lastTapAt = 0;
 let lastTapX = 0;
 let lastTapY = 0;
+let lastTapKind = "outside";
 
 function syncCanvasDisplaySize() {
   const rect = gameWrap.getBoundingClientRect();
@@ -578,6 +586,12 @@ window.addEventListener("orientationchange", updateViewportLayout);
 
 if ("ResizeObserver" in window) {
   new ResizeObserver(syncCanvasDisplaySize).observe(gameWrap);
+}
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
 }
 
 function setControlsCollapsed(collapsed) {
@@ -788,11 +802,18 @@ let manualOverrideMs = 0;
 
 let dragState = {
   active: false,
+  kind: null,
+  pointerId: null,
   type: null,
   fromX: 0,
   fromY: 0,
+  grabX: 0,
+  grabY: 0,
+  startX: 0,
+  startY: 0,
   px: 0,
-  py: 0
+  py: 0,
+  moved: false
 };
 
 function createBoard() {
@@ -1518,51 +1539,75 @@ function isInsideBoardCell(x, y) {
   return x >= 0 && x < W && y >= 0 && y < H;
 }
 
-function onCanvasPointerDown(event) {
-  const point = canvasPointFromEvent(event);
-  const now = performance.now();
-  const dist = Math.hypot(point.x - lastTapX, point.y - lastTapY);
+function isCurrentPieceCell(cell) {
+  if (!current) return false;
+  const localX = cell.x - current.x;
+  const localY = cell.y - current.y;
+  return Boolean(
+    current.shape[localY] &&
+    current.shape[localY][localX]
+  );
+}
 
-  if (now - lastTapAt < 320 && dist < 55) {
-    event.preventDefault();
-    lastTapAt = 0;
-    togglePause();
-    return;
+function getCanvasTarget(point) {
+  const cell = gridFromCanvasPoint(point);
+  if (isInsideBoardCell(cell.x, cell.y) && isCurrentPieceCell(cell)) {
+    return {
+      kind: "current",
+      cell,
+      grabX: cell.x - current.x,
+      grabY: cell.y - current.y
+    };
   }
 
-  lastTapAt = now;
-  lastTapX = point.x;
-  lastTapY = point.y;
+  if (isInsideBoardCell(cell.x, cell.y) && board[cell.y][cell.x]) {
+    return { kind: "locked", cell };
+  }
 
-  const cell = gridFromCanvasPoint(point);
-  if (!isInsideBoardCell(cell.x, cell.y)) return;
-  if (!board[cell.y][cell.x]) return;
-
-  event.preventDefault();
-  canvas.setPointerCapture(event.pointerId);
-
-  dragState.active = true;
-  dragState.type = board[cell.y][cell.x].type;
-  dragState.fromX = cell.x;
-  dragState.fromY = cell.y;
-  dragState.px = point.x;
-  dragState.py = point.y;
-
-  board[cell.y][cell.x] = null;
-  setManualOverride("Block grabbed");
+  return { kind: "outside", cell };
 }
 
-function onCanvasPointerMove(event) {
-  if (!dragState.active) return;
-  const point = canvasPointFromEvent(event);
-  dragState.px = point.x;
-  dragState.py = point.y;
+function captureCanvasPointer(event) {
+  dragState.pointerId = event.pointerId;
+  if (canvas.setPointerCapture) {
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch (_) {}
+  }
 }
 
-function onCanvasPointerUp(event) {
-  if (!dragState.active) return;
+function releaseCanvasPointer() {
+  if (dragState.pointerId !== null && canvas.releasePointerCapture) {
+    try {
+      canvas.releasePointerCapture(dragState.pointerId);
+    } catch (_) {}
+  }
+}
 
-  const point = canvasPointFromEvent(event);
+function resetDragState() {
+  releaseCanvasPointer();
+  dragState.active = false;
+  dragState.kind = null;
+  dragState.pointerId = null;
+  dragState.type = null;
+  dragState.grabX = 0;
+  dragState.grabY = 0;
+  dragState.moved = false;
+}
+
+function moveCurrentPieceTo(x, y) {
+  if (!current) return false;
+  const safeY = Math.max(1 - current.shape.length, y);
+  if (collision(current.shape, x, safeY)) return false;
+
+  current.x = x;
+  current.y = safeY;
+  target = null;
+  setManualOverride("Piece dragged");
+  return true;
+}
+
+function finishLockedBlockDrag(point) {
   const cell = gridFromCanvasPoint(point);
   const inside = isInsideBoardCell(cell.x, cell.y);
 
@@ -1576,8 +1621,6 @@ function onCanvasPointerUp(event) {
     addMessage("BLOCKED", theme().danger);
   }
 
-  dragState.active = false;
-  dragState.type = null;
   setManualOverride("Board sabotaged");
 
   const lines = clearLines();
@@ -1587,6 +1630,94 @@ function onCanvasPointerUp(event) {
     slowmo = 180;
     shake = 4;
   }
+}
+
+function onCanvasPointerDown(event) {
+  const point = canvasPointFromEvent(event);
+  const targetInfo = getCanvasTarget(point);
+  const now = performance.now();
+  const tapKind = targetInfo.kind === "outside" ? "outside" : "brick";
+  const isDoubleTap = (
+    now - lastTapAt < 320 &&
+    tapKind === lastTapKind &&
+    Math.hypot(point.x - lastTapX, point.y - lastTapY) < 55
+  );
+
+  event.preventDefault();
+
+  if (isDoubleTap && tapKind === "brick") {
+    lastTapAt = 0;
+    userRotate(1);
+    return;
+  }
+
+  lastTapAt = now;
+  lastTapX = point.x;
+  lastTapY = point.y;
+  lastTapKind = tapKind;
+
+  dragState.active = true;
+  dragState.kind = targetInfo.kind;
+  dragState.startX = point.x;
+  dragState.startY = point.y;
+  dragState.px = point.x;
+  dragState.py = point.y;
+  dragState.moved = false;
+  captureCanvasPointer(event);
+
+  if (targetInfo.kind === "current") {
+    dragState.grabX = targetInfo.grabX;
+    dragState.grabY = targetInfo.grabY;
+    setManualOverride("Piece grabbed");
+    return;
+  }
+
+  if (targetInfo.kind === "locked") {
+    dragState.type = board[targetInfo.cell.y][targetInfo.cell.x].type;
+    dragState.fromX = targetInfo.cell.x;
+    dragState.fromY = targetInfo.cell.y;
+    board[targetInfo.cell.y][targetInfo.cell.x] = null;
+    setManualOverride("Block grabbed");
+  }
+}
+
+function onCanvasPointerMove(event) {
+  if (!dragState.active) return;
+  const point = canvasPointFromEvent(event);
+  dragState.px = point.x;
+  dragState.py = point.y;
+
+  if (Math.hypot(point.x - dragState.startX, point.y - dragState.startY) > 10) {
+    dragState.moved = true;
+  }
+
+  if (dragState.kind !== "current") return;
+
+  const cell = gridFromCanvasPoint(point);
+  const targetX = cell.x - dragState.grabX;
+  const targetY = cell.y - dragState.grabY;
+
+  if (moveCurrentPieceTo(targetX, targetY)) {
+    dragState.moved = true;
+  }
+}
+
+function onCanvasPointerUp(event) {
+  if (!dragState.active) return;
+
+  const point = canvasPointFromEvent(event);
+  const kind = dragState.kind;
+  const wasTap = Math.hypot(point.x - dragState.startX, point.y - dragState.startY) < 10;
+
+  if (kind === "outside" && wasTap) {
+    togglePause();
+  } else if (kind === "locked") {
+    finishLockedBlockDrag(point);
+  } else if (kind === "current") {
+    setManualOverride("Piece dragged");
+  }
+
+  resetDragState();
 }
 
 canvas.addEventListener("pointerdown", onCanvasPointerDown);
@@ -1755,7 +1886,7 @@ function drawParticles() {
 }
 
 function drawDraggedBlock() {
-  if (!dragState.active || !dragState.type) return;
+  if (!dragState.active || dragState.kind !== "locked" || !dragState.type) return;
   const color = colorOf(dragState.type);
   const size = CELL - 4;
 
@@ -1877,7 +2008,10 @@ function resetGame() {
   manualOverrideMs = aiEnabled ? 0 : 999999;
   paused = false;
   dragState.active = false;
+  dragState.kind = null;
+  dragState.pointerId = null;
   dragState.type = null;
+  dragState.moved = false;
 
   execution.activeError = null;
   execution.lastErrorPiece = -999;
