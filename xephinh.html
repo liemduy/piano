@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#060814" />
+  <meta name="theme-color" content="#101816" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -20,16 +20,19 @@
     }
 
     :root {
-      --bg1: #20314f;
-      --bg2: #060814;
-      --card: rgba(255,255,255,0.08);
-      --card2: rgba(255,255,255,0.13);
-      --text: #ffffff;
-      --muted: #9fb7c5;
-      --accent: #61e8ff;
-      --danger: #ff6b8a;
-      --shadow: rgba(0,225,255,0.18);
-      --app-h: 100vh;
+      --bg1: #263832;
+      --bg2: #101816;
+      --bg-solid: #101816;
+      --card: rgba(255,255,255,0.075);
+      --card2: rgba(255,255,255,0.12);
+      --text: #f3f7fb;
+      --muted: #a9b8c7;
+      --accent: #7ed6df;
+      --danger: #ef7d96;
+      --success: #98d8b8;
+      --warning: #e8d48a;
+      --shadow: rgba(126,214,223,0.12);
+      --app-h: 100dvh;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-left: env(safe-area-inset-left, 0px);
@@ -50,22 +53,33 @@
       --shadow: rgba(0,119,255,0.16);
     }
 
-    body[data-theme="neon"] { --accent: #61e8ff; --danger: #ff6b8a; }
-    body[data-theme="pastel"] { --accent: #c084fc; --danger: #fb7185; }
-    body[data-theme="matrix"] { --accent: #70f0a2; --danger: #facc15; }
-    body[data-theme="sunset"] { --accent: #ffb86b; --danger: #ff4d6d; }
+    body[data-theme="neon"] { --accent: #7ed6df; --danger: #ef7d96; }
+    body[data-theme="pastel"] { --accent: #b9a7df; --danger: #e89bab; }
+    body[data-theme="matrix"] { --accent: #98d8b8; --danger: #e8d48a; }
+    body[data-theme="sunset"] { --accent: #e5b37b; --danger: #e98a98; }
 
     html,
     body {
       margin: 0;
       width: 100%;
       height: 100%;
+      min-height: 100dvh;
       overflow: hidden;
       overscroll-behavior: none;
+      background-color: var(--bg-solid);
       background: radial-gradient(circle at top, var(--bg1), var(--bg2) 72%);
       color: var(--text);
       font-family: system-ui, Arial, sans-serif;
       touch-action: manipulation;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -40px 0;
+      z-index: -1;
+      background-color: var(--bg-solid);
+      background: radial-gradient(circle at 50% 0, var(--bg1), var(--bg2) 72%);
     }
 
     .app {
@@ -73,9 +87,12 @@
       inset: 0;
       width: 100vw;
       height: var(--app-h);
+      min-height: 100dvh;
       display: grid;
       grid-template-rows: minmax(0, 1fr) var(--controls-h);
       gap: var(--app-gap);
+      background-color: var(--bg-solid);
+      background: radial-gradient(circle at 50% 0, var(--bg1), var(--bg2) 72%);
       padding:
         max(1px, var(--safe-top))
         max(1px, var(--safe-right))
@@ -148,9 +165,9 @@
       place-items: center;
       border: 1px solid rgba(255,255,255,0.14);
       border-radius: 999px;
-      background: rgba(0,0,0,0.34);
+      background: rgba(16,25,39,0.72);
       color: white;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 18px rgba(0,0,0,0.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.18);
       backdrop-filter: blur(12px);
       font-size: 22px;
       font-weight: 1000;
@@ -190,9 +207,9 @@
       place-items: center;
       border: 1px solid rgba(255,255,255,0.14);
       border-radius: 999px;
-      background: rgba(0,0,0,0.36);
+      background: rgba(16,25,39,0.72);
       color: white;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 18px rgba(0,0,0,0.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.18);
       backdrop-filter: blur(12px);
       font-size: 13px;
       font-weight: 1000;
@@ -202,11 +219,11 @@
     }
 
     .mini-action.bomb {
-      background: var(--danger);
+      background: #c97486;
     }
 
     .mini-action.laser {
-      background: #ffe66d;
+      background: var(--warning);
       color: #06111a;
     }
 
@@ -222,16 +239,17 @@
       grid-template-columns: minmax(78px, 0.9fr) minmax(126px, 1.22fr) minmax(74px, 0.82fr);
       gap: 4px;
       overflow: hidden;
+      align-items: stretch;
     }
 
     .panel {
       min-width: 0;
       min-height: 0;
-      border-radius: 10px;
+      border-radius: 8px;
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.09);
       backdrop-filter: blur(10px);
-      padding: 5px;
+      padding: 6px;
       overflow: hidden;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
@@ -267,6 +285,7 @@
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
       gap: 3px;
+      place-self: center;
     }
 
     .pad-btn,
@@ -277,11 +296,16 @@
       background: var(--card2);
       color: var(--text);
       font-weight: 1000;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 4px 10px rgba(0,0,0,0.12);
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      padding: 0;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 3px 8px rgba(0,0,0,0.12);
       touch-action: none;
       cursor: pointer;
       min-width: 0;
       min-height: 0;
+      overflow: hidden;
     }
 
     .pad-btn:active,
@@ -293,6 +317,9 @@
 
     .pad-btn {
       font-size: clamp(14px, 4.4vw, 20px);
+      width: 100%;
+      height: 100%;
+      border-radius: 9px;
     }
 
     .pad-btn.up { grid-column: 2; grid-row: 1; }
@@ -306,16 +333,19 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 5px;
+      align-items: stretch;
     }
 
     .action-btn {
       font-size: clamp(16px, 5.8vw, 26px);
       color: #06111a;
       background: var(--accent);
-      border-radius: 12px;
+      border-radius: 10px;
       line-height: 1;
       padding: 0 2px;
       white-space: nowrap;
+      width: 100%;
+      height: 100%;
     }
 
     .action-btn.secondary {
@@ -324,12 +354,12 @@
     }
 
     .action-btn.utility {
-      background: #70f0a2;
+      background: var(--success);
       color: #06111a;
     }
 
     .action-btn.beam {
-      background: #ffe66d;
+      background: var(--warning);
       color: #06111a;
     }
 
@@ -344,7 +374,7 @@
       height: 100%;
       min-height: 0;
       display: grid;
-      grid-template-rows: minmax(25px, 0.72fr) minmax(25px, 0.72fr) minmax(30px, 0.82fr) minmax(40px, 1fr);
+      grid-template-rows: minmax(24px, 0.66fr) minmax(24px, 0.66fr) minmax(36px, 0.95fr) minmax(34px, 0.8fr);
       gap: 3px;
     }
 
@@ -372,13 +402,17 @@
 
     .size-btn {
       border: 0;
-      border-radius: 9px;
+      border-radius: 8px;
       background: var(--accent);
       color: #06111a;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 1000;
       cursor: pointer;
       touch-action: manipulation;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      line-height: 1;
     }
 
     .size-readout {
@@ -446,6 +480,7 @@
       font-size: 8px;
       background: var(--accent);
       color: #06111a;
+      border-radius: 8px;
     }
 
     .ai-toggle.off {
@@ -486,7 +521,7 @@
       }
 
       .action-btn {
-        font-size: 22px;
+        font-size: 18px;
       }
     }
 
@@ -507,7 +542,7 @@
 
       .center-stack {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(25px, 0.72fr) minmax(25px, 0.72fr) minmax(30px, 0.82fr) minmax(40px, 1fr);
+        grid-template-rows: minmax(24px, 0.66fr) minmax(24px, 0.66fr) minmax(36px, 0.95fr) minmax(34px, 0.8fr);
       }
     }
   </style>
@@ -645,7 +680,8 @@ function syncCanvasDisplaySize() {
 }
 
 function updateViewportLayout() {
-  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const visualH = window.visualViewport ? window.visualViewport.height : 0;
+  const h = Math.max(window.innerHeight || 0, visualH || 0);
   document.documentElement.style.setProperty("--app-h", `${Math.floor(h)}px`);
   requestAnimationFrame(syncCanvasDisplaySize);
 }
@@ -681,12 +717,12 @@ function setControlsCollapsed(collapsed) {
 }
 const THEME_PRESETS = {
   neon: {
-    bgTopDark: "rgba(22, 36, 70, 0.98)",
-    bgBottomDark: "rgba(4, 6, 16, 0.98)",
+    bgTopDark: "rgba(38, 56, 50, 0.98)",
+    bgBottomDark: "rgba(16, 24, 22, 0.98)",
     bgTopLight: "rgba(221, 248, 255, 0.98)",
     bgBottomLight: "rgba(247, 252, 255, 0.98)",
-    accent: "#61e8ff",
-    danger: "#ff6b8a"
+    accent: "#7ed6df",
+    danger: "#ef7d96"
   },
   pastel: {
     bgTopDark: "rgba(48, 38, 70, 0.98)",
@@ -831,8 +867,8 @@ const SHAPES = {
 
 const PIECE_COLORS_BY_THEME = {
   neon: {
-    I: "#61e8ff", O: "#ffe66d", T: "#c084fc", S: "#70f0a2",
-    Z: "#ff6b8a", J: "#60a5fa", L: "#ffb86b"
+    I: "#86d6d6", O: "#e5d17e", T: "#b9a7df", S: "#98d8b8",
+    Z: "#e98a98", J: "#8fb5de", L: "#d9a477"
   },
   pastel: {
     I: "#93c5fd", O: "#fde68a", T: "#d8b4fe", S: "#bbf7d0",
@@ -2113,7 +2149,7 @@ function drawBlock(gx, gy, color, alpha = 1, scale = 1) {
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.shadowColor = color;
-  ctx.shadowBlur = 13;
+  ctx.shadowBlur = 8;
 
   roundRect(cx - size / 2, cy - size / 2, size, size, 7);
   ctx.fillStyle = color;
@@ -2137,7 +2173,7 @@ function drawMatrix(shape, px, py, color, alpha = 1, scale = 1) {
 function drawBackground() {
   const t = theme();
   const danger = drama.risk;
-  const redAlpha = Math.max(0, (danger - 0.45) * 0.55);
+  const redAlpha = Math.max(0, (danger - 0.45) * 0.28);
 
   ctx.clearRect(0, 0, VIEW_W, VIEW_H);
 
@@ -2161,7 +2197,7 @@ function drawBackground() {
     ctx.restore();
   }
 
-  ctx.strokeStyle = visualMode === "dark" ? "rgba(255,255,255,0.055)" : "rgba(0,0,0,0.06)";
+  ctx.strokeStyle = visualMode === "dark" ? "rgba(235,245,240,0.045)" : "rgba(0,0,0,0.06)";
   ctx.lineWidth = 1;
 
   for (let x = 0; x <= W; x++) {
@@ -2179,7 +2215,7 @@ function drawBackground() {
   }
 
   ctx.save();
-  ctx.globalAlpha = 0.18 + danger * 0.45;
+  ctx.globalAlpha = 0.14 + danger * 0.28;
   ctx.strokeStyle = danger > 0.62 ? t.danger : t.accent;
   ctx.lineWidth = 2.4;
   roundRect(OX, OY, W * CELL, H * CELL, 12);
