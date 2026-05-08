@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -168,6 +169,52 @@
       color: #06111a;
     }
 
+    .collapsed-actions {
+      position: absolute;
+      top: max(52px, calc(var(--safe-top) + 50px));
+      right: max(10px, calc(var(--safe-right) + 8px));
+      z-index: 5;
+      display: none;
+      grid-template-rows: repeat(2, 34px);
+      gap: 7px;
+    }
+
+    .app.controls-collapsed .collapsed-actions {
+      display: grid;
+    }
+
+    .mini-action {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.36);
+      color: white;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 18px rgba(0,0,0,0.18);
+      backdrop-filter: blur(12px);
+      font-size: 13px;
+      font-weight: 1000;
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .mini-action.bomb {
+      background: var(--danger);
+    }
+
+    .mini-action.laser {
+      background: #ffe66d;
+      color: #06111a;
+    }
+
+    .mini-action:disabled {
+      opacity: 0.56;
+      font-size: 10px;
+    }
+
     .controls-wrap {
       min-height: 0;
       min-width: 0;
@@ -224,8 +271,6 @@
 
     .pad-btn,
     .action-btn,
-    .theme-btn,
-    .mode-btn,
     .ai-toggle {
       border: 0;
       border-radius: 10px;
@@ -241,8 +286,6 @@
 
     .pad-btn:active,
     .action-btn:active,
-    .theme-btn:active,
-    .mode-btn:active,
     .ai-toggle:active {
       transform: scale(0.95);
       filter: brightness(1.12);
@@ -260,20 +303,41 @@
     .action-pad {
       min-height: 0;
       display: grid;
+      grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 5px;
     }
 
     .action-btn {
-      font-size: clamp(20px, 7vw, 30px);
+      font-size: clamp(16px, 5.8vw, 26px);
       color: #06111a;
       background: var(--accent);
       border-radius: 12px;
+      line-height: 1;
+      padding: 0 2px;
+      white-space: nowrap;
     }
 
     .action-btn.secondary {
       background: var(--danger);
       color: white;
+    }
+
+    .action-btn.utility {
+      background: #70f0a2;
+      color: #06111a;
+    }
+
+    .action-btn.beam {
+      background: #ffe66d;
+      color: #06111a;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.48;
+      transform: none;
+      filter: grayscale(0.2);
+      font-size: clamp(12px, 4.2vw, 17px);
     }
 
     .center-stack {
@@ -292,10 +356,43 @@
       overflow: hidden;
     }
 
-    .theme-card {
+    .size-card {
       display: grid;
-      grid-template-rows: 1fr 18px;
+      grid-template-rows: auto minmax(0, 1fr);
       gap: 3px;
+    }
+
+    .size-stepper {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr) 32px;
+      gap: 4px;
+      align-items: stretch;
+    }
+
+    .size-btn {
+      border: 0;
+      border-radius: 9px;
+      background: var(--accent);
+      color: #06111a;
+      font-size: 15px;
+      font-weight: 1000;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .size-readout {
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 8px;
+      font-weight: 1000;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .label-row {
@@ -374,31 +471,6 @@
       background: transparent;
     }
 
-    .themes {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 3px;
-      min-height: 0;
-    }
-
-    .theme-btn,
-    .mode-btn {
-      height: 100%;
-      min-height: 18px;
-      font-size: 7px;
-      padding: 0 2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .theme-btn.active {
-      outline: 2px solid var(--accent);
-    }
-
-    .mode-btn {
-      width: 100%;
-    }
-
     @media (max-height: 720px) {
       :root {
         --controls-h: clamp(146px, 23vh, 158px);
@@ -411,12 +483,6 @@
       .dpad {
         width: min(100%, 96px);
         height: min(100%, 96px);
-      }
-
-      .theme-btn,
-      .mode-btn {
-        min-height: 17px;
-        font-size: 6.5px;
       }
 
       .action-btn {
@@ -469,13 +535,22 @@
       <div class="panel">
         <div class="center-stack">
           <div class="mini-card">
-            <div class="label-row"><span>RISK</span><span id="riskValue" class="value">1.0x</span></div>
+            <div class="label-row"><span>DRAMA</span><span id="riskValue" class="value">1.0x</span></div>
             <input id="riskRange" class="slider" type="range" min="0.2" max="2.2" step="0.1" value="1.0">
           </div>
 
           <div class="mini-card">
-            <div class="label-row"><span>SPEED</span><span id="speedValue" class="value">1.0x</span></div>
-            <input id="speedRange" class="slider" type="range" min="0.5" max="2.5" step="0.1" value="1.0">
+            <div class="label-row"><span>LEVEL</span><span id="speedValue" class="value">LV 4</span></div>
+            <input id="speedRange" class="slider" type="range" min="1" max="10" step="1" value="4">
+          </div>
+
+          <div class="mini-card size-card">
+            <div class="label-row"><span>SIZE</span><span id="sizeValue" class="value">10x20</span></div>
+            <div class="size-stepper">
+              <button id="sizeMinusBtn" class="size-btn" type="button">-</button>
+              <div id="sizeLabel" class="size-readout">NORMAL</div>
+              <button id="sizePlusBtn" class="size-btn" type="button">+</button>
+            </div>
           </div>
 
           <div class="mini-card next-ai-card">
@@ -486,29 +561,25 @@
               <button id="aiToggleBtn" class="ai-toggle on" type="button">AI ON</button>
             </div>
           </div>
-
-          <div class="mini-card theme-card">
-            <div class="themes">
-              <button class="theme-btn active" data-theme="neon" type="button">Neon</button>
-              <button class="theme-btn" data-theme="pastel" type="button">Pastel</button>
-              <button class="theme-btn" data-theme="matrix" type="button">Matrix</button>
-              <button class="theme-btn" data-theme="sunset" type="button">Sunset</button>
-            </div>
-            <button id="modeBtn" class="mode-btn" type="button">Dark / Light</button>
-          </div>
         </div>
       </div>
 
       <div class="panel">
-        <div class="title">ROTATE</div>
+        <div class="title">ACTION</div>
         <div class="action-pad">
           <button id="btnA" class="action-btn" type="button">A</button>
           <button id="btnB" class="action-btn secondary" type="button">B</button>
+          <button id="btnC" class="action-btn utility" type="button">C</button>
+          <button id="btnD" class="action-btn beam" type="button">D</button>
         </div>
       </div>
     </section>
 
     <button id="controlToggleBtn" class="control-toggle" type="button" aria-label="Collapse controls" aria-expanded="true">▾</button>
+    <div class="collapsed-actions" aria-label="Collapsed actions">
+      <button id="miniBombBtn" class="mini-action bomb" type="button" aria-label="Drop bomb">✹</button>
+      <button id="miniLaserBtn" class="mini-action laser" type="button" aria-label="Fire laser">━</button>
+    </div>
   </main>
 
 <script>
@@ -531,21 +602,27 @@ const btnDown = document.getElementById("btnDown");
 const btnUp = document.getElementById("btnUp");
 const btnA = document.getElementById("btnA");
 const btnB = document.getElementById("btnB");
+const btnC = document.getElementById("btnC");
+const btnD = document.getElementById("btnD");
+const miniBombBtn = document.getElementById("miniBombBtn");
+const miniLaserBtn = document.getElementById("miniLaserBtn");
 
 const speedRange = document.getElementById("speedRange");
 const speedValue = document.getElementById("speedValue");
 const riskRange = document.getElementById("riskRange");
 const riskValue = document.getElementById("riskValue");
+const sizeMinusBtn = document.getElementById("sizeMinusBtn");
+const sizePlusBtn = document.getElementById("sizePlusBtn");
+const sizeValue = document.getElementById("sizeValue");
+const sizeLabel = document.getElementById("sizeLabel");
 const nextPiece = document.getElementById("nextPiece");
-const modeBtn = document.getElementById("modeBtn");
 const aiToggleBtn = document.getElementById("aiToggleBtn");
 const statusChip = document.getElementById("statusChip");
 const controlToggleBtn = document.getElementById("controlToggleBtn");
-const themeButtons = [...document.querySelectorAll(".theme-btn")];
 
 let visualTheme = "neon";
 let visualMode = "dark";
-let speedFactor = 1;
+let speedFactor = Number(speedRange.value);
 let riskFactor = 1;
 let aiEnabled = true;
 let controlsCollapsed = false;
@@ -641,32 +718,26 @@ function theme() {
   return THEME_PRESETS[visualTheme];
 }
 
-themeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    visualTheme = btn.dataset.theme;
-    document.body.dataset.theme = visualTheme;
-    themeButtons.forEach(x => x.classList.toggle("active", x === btn));
-  });
-});
-
 controlToggleBtn.addEventListener("click", () => {
   setControlsCollapsed(!controlsCollapsed);
 });
 
-modeBtn.addEventListener("click", () => {
-  visualMode = visualMode === "dark" ? "light" : "dark";
-  document.body.dataset.mode = visualMode;
-
-});
-
 speedRange.addEventListener("input", () => {
   speedFactor = Number(speedRange.value);
-  speedValue.textContent = speedFactor.toFixed(1) + "x";
+  speedValue.textContent = "LV " + speedFactor;
 });
 
 riskRange.addEventListener("input", () => {
   riskFactor = Number(riskRange.value);
   riskValue.textContent = riskFactor.toFixed(1) + "x";
+});
+
+sizeMinusBtn.addEventListener("click", () => {
+  setGridSize(sizePresetIndex - 1);
+});
+
+sizePlusBtn.addEventListener("click", () => {
+  setGridSize(sizePresetIndex + 1);
 });
 
 aiToggleBtn.addEventListener("click", () => {
@@ -708,11 +779,45 @@ function bindHoldButton(button, action, repeatMs = 95, repeat = true) {
   button.addEventListener("pointerleave", stop);
 }
 
-const W = 10;
-const H = 20;
-const CELL = 34;
+const SIZE_PRESETS = [
+  { level: -2, label: "TINY", cols: 16 },
+  { level: -1, label: "SMALL", cols: 13 },
+  { level: 0, label: "NORMAL", cols: 10 },
+  { level: 1, label: "BIG", cols: 8 },
+  { level: 2, label: "HUGE", cols: 7 }
+];
+
+let sizePresetIndex = 2;
+let W = 10;
+let H = 20;
+let CELL = 34;
 const OX = 0;
 const OY = 0;
+
+function applyGridSize(index) {
+  sizePresetIndex = Math.max(0, Math.min(SIZE_PRESETS.length - 1, index));
+  const preset = SIZE_PRESETS[sizePresetIndex];
+  W = preset.cols;
+  H = preset.cols * 2;
+  CELL = VIEW_W / W;
+}
+
+function updateSizeUI() {
+  const preset = SIZE_PRESETS[sizePresetIndex];
+  sizeValue.textContent = `${W}x${H}`;
+  sizeLabel.textContent = preset.label;
+  sizeMinusBtn.disabled = sizePresetIndex === 0;
+  sizePlusBtn.disabled = sizePresetIndex === SIZE_PRESETS.length - 1;
+}
+
+function setGridSize(index) {
+  if (index === sizePresetIndex) return;
+  applyGridSize(index);
+  updateSizeUI();
+  resetGame();
+}
+
+applyGridSize(sizePresetIndex);
 
 const SHAPES = {
   I: [[1, 1, 1, 1]],
@@ -799,6 +904,11 @@ let execution = {
 };
 
 let manualOverrideMs = 0;
+const SPECIAL_COOLDOWN_MS = 30000;
+let bombCooldownMs = 0;
+let laserCooldownMs = 0;
+let autoSaveCooldownMs = 0;
+let fallingBomb = null;
 
 let dragState = {
   active: false,
@@ -971,16 +1081,16 @@ function getDangerLevel(b) {
   const maxHeight = getMaxHeight(b);
   const holes = countHoles(b);
   let danger = 0;
-  danger += maxHeight / 18;
-  danger += Math.min(holes / 8, 1) * 0.45;
+  danger += maxHeight / Math.max(8, H * 0.86);
+  danger += Math.min(holes / Math.max(8, W * 1.2), 1) * 0.4;
   return Math.min(1, danger);
 }
 
 function hasTetrisWell(b) {
   const heights = getColumnHeights(b);
   for (let x = 0; x < W; x++) {
-    const left = x === 0 ? 20 : heights[x - 1];
-    const right = x === W - 1 ? 20 : heights[x + 1];
+    const left = x === 0 ? H : heights[x - 1];
+    const right = x === W - 1 ? H : heights[x + 1];
     if (left >= 4 && right >= 4 && heights[x] <= Math.max(left, right) - 3) {
       return true;
     }
@@ -1098,7 +1208,7 @@ function rankMovesWithLookahead(b, type, queue) {
 
 function chooseMove(b, type, queue = []) {
   const ranked = rankMovesWithLookahead(b, type, queue);
-  return ranked[0] || { x: 4, y: 0, rot: 0, cleared: 0, score: 0 };
+  return ranked[0] || { x: Math.floor(W / 2), y: 0, rot: 0, cleared: 0, score: 0 };
 }
 
 function canLandAt(type, rot, x) {
@@ -1113,29 +1223,22 @@ function canLandAt(type, rot, x) {
 function maybeCreateExecutionError(type) {
   execution.activeError = null;
   if (!aiEnabled) return;
-  if (!aiEnabled) return;
   execution.offsetDir = 0;
   execution.delayFrames = 0;
 
   const danger = getDangerLevel(board);
-  if (danger > 0.68) return;
+  if (danger > 0.38) return;
   if (pieceIndex < execution.nextErrorAt) return;
   if (pieceIndex - execution.lastErrorPiece < execution.minGap) return;
 
   execution.lastErrorPiece = pieceIndex;
-  execution.nextErrorAt = pieceIndex + 9 + Math.floor(Math.random() * 10 / Math.max(0.4, riskFactor * 0.8));
+  execution.nextErrorAt = pieceIndex + 18 + Math.floor(Math.random() * 18);
 
-  const triggerChance = 0.55 * riskFactor;
-  if (Math.random() > Math.min(triggerChance, 0.92)) return;
+  const triggerChance = Math.max(0, riskFactor - 1) * 0.06;
+  if (Math.random() > Math.min(triggerChance, 0.08)) return;
 
   const possible = [];
-  if (target) {
-    if (canLandAt(type, target.rot, target.x - 1)) possible.push("OFFSET_LEFT");
-    if (canLandAt(type, target.rot, target.x + 1)) possible.push("OFFSET_RIGHT");
-    if (ROTATIONS[type].length > 1) possible.push("OVER_ROTATE");
-  }
   possible.push("INPUT_DELAY");
-  possible.push("EARLY_DROP");
 
   const picked = possible[Math.floor(Math.random() * possible.length)];
 
@@ -1206,12 +1309,250 @@ function userRotate(dir) {
   }
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getShapeBounds(shape) {
+  return {
+    width: Math.max(...shape.map(row => row.length)),
+    height: shape.length
+  };
+}
+
+function burstCell(x, y, color, count = 8) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: OX + x * CELL + CELL / 2,
+      y: OY + y * CELL + CELL / 2,
+      vx: (Math.random() - 0.5) * 7,
+      vy: -Math.random() * 5 - 1,
+      life: 620,
+      max: 620,
+      size: Math.random() * 3.4 + 1.8,
+      color
+    });
+  }
+}
+
+function clearBottomRows(count, label = "LASER CLEAR", color = theme().accent) {
+  const rows = Math.min(count, H);
+  const start = H - rows;
+  let removed = 0;
+
+  for (let y = start; y < H; y++) {
+    flashes.push({ y, life: 360, max: 360 });
+    for (let x = 0; x < W; x++) {
+      const cell = board[y][x];
+      if (!cell) continue;
+      removed++;
+      burstCell(x, y, colorOf(cell.type), 5);
+    }
+  }
+
+  board.splice(start, rows);
+  while (board.length < H) {
+    board.unshift(Array(W).fill(null));
+  }
+
+  slowmo = Math.max(slowmo, 260);
+  shake = Math.max(shake, 7);
+  score += removed * 35 + rows * 220;
+  recoveryMode = Math.max(recoveryMode, 0.75);
+  addMessage(label, color);
+  return removed;
+}
+
+function findDensestBombCenter(radius) {
+  let best = null;
+  let bestScore = -Infinity;
+
+  for (let cy = 0; cy < H; cy++) {
+    for (let cx = 0; cx < W; cx++) {
+      let localScore = 0;
+      for (let y = Math.max(0, cy - radius); y <= Math.min(H - 1, cy + radius); y++) {
+        for (let x = Math.max(0, cx - radius); x <= Math.min(W - 1, cx + radius); x++) {
+          const cell = board[y][x];
+          if (!cell) continue;
+          const d = Math.hypot(x - cx, y - cy);
+          if (d <= radius + 0.35) {
+            localScore += 10 - d * 2 + y / H;
+          }
+        }
+      }
+      if (localScore > bestScore) {
+        bestScore = localScore;
+        best = { x: cx, y: cy };
+      }
+    }
+  }
+
+  return bestScore > 0 ? best : null;
+}
+
+function findMostDangerousBombCenter(radius) {
+  let best = null;
+  let bestScore = -Infinity;
+  const heights = getColumnHeights(board);
+
+  for (let cy = 0; cy < H; cy++) {
+    for (let cx = 0; cx < W; cx++) {
+      let localScore = 0;
+      for (let y = Math.max(0, cy - radius); y <= Math.min(H - 1, cy + radius); y++) {
+        for (let x = Math.max(0, cx - radius); x <= Math.min(W - 1, cx + radius); x++) {
+          const d = Math.hypot(x - cx, y - cy);
+          if (d > radius + 0.35) continue;
+
+          const cell = board[y][x];
+          if (cell) {
+            const heightPressure = (H - y) / H;
+            const columnPressure = heights[x] / H;
+            localScore += 8 + heightPressure * 12 + columnPressure * 10 - d * 2;
+          } else {
+            let hasBlockAbove = false;
+            for (let yy = 0; yy < y; yy++) {
+              if (board[yy][x]) {
+                hasBlockAbove = true;
+                break;
+              }
+            }
+            if (hasBlockAbove) localScore += 4;
+          }
+        }
+      }
+
+      if (localScore > bestScore) {
+        bestScore = localScore;
+        best = { x: cx, y: cy };
+      }
+    }
+  }
+
+  return bestScore > 0 ? best : null;
+}
+
+function getBombCenter(radius) {
+  const dangerTarget = findMostDangerousBombCenter(radius);
+  if (dangerTarget) return dangerTarget;
+
+  if (current) {
+    const bounds = getShapeBounds(current.shape);
+    const ghostY = getGhostY(current.shape, current.x);
+    return {
+      x: clamp(Math.round(current.x + bounds.width / 2 - 0.5), 0, W - 1),
+      y: clamp(Math.round(ghostY + bounds.height / 2 - 0.5), 0, H - 1)
+    };
+  }
+
+  return findDensestBombCenter(radius) || { x: Math.floor(W / 2), y: H - 3 };
+}
+
+function collectBombCells(cx, cy, radius) {
+  const cells = [];
+  for (let y = Math.max(0, cy - radius); y <= Math.min(H - 1, cy + radius); y++) {
+    for (let x = Math.max(0, cx - radius); x <= Math.min(W - 1, cx + radius); x++) {
+      if (!board[y][x]) continue;
+      const d = Math.hypot(x - cx, y - cy);
+      if (d <= radius + 0.35) {
+        cells.push({ x, y, d });
+      }
+    }
+  }
+
+  cells.sort((a, b) => a.d - b.d);
+  return cells.slice(0, Math.max(8, Math.floor(W * H * 0.08)));
+}
+
+function dropBomb() {
+  if (bombCooldownMs > 0) return;
+  if (fallingBomb) return;
+
+  const radius = clamp(Math.round(W / 5), 2, 3);
+  const center = getBombCenter(radius);
+  fallingBomb = {
+    x: Math.floor(W / 2),
+    y: -1.25,
+    targetX: center.x,
+    targetY: center.y,
+    radius
+  };
+
+  bombCooldownMs = SPECIAL_COOLDOWN_MS;
+  drama.controlText = "Bomb launched";
+  addMessage("BOMB DROP", theme().danger);
+}
+
+function explodeFallingBomb() {
+  if (!fallingBomb) return;
+
+  const cx = clamp(Math.round(fallingBomb.x), 0, W - 1);
+  const cy = clamp(Math.round(fallingBomb.y), 0, H - 1);
+  let cells = collectBombCells(cx, cy, fallingBomb.radius);
+
+  if (cells.length === 0) {
+    const fallback = findDensestBombCenter(fallingBomb.radius);
+    if (fallback) {
+      cells = collectBombCells(fallback.x, fallback.y, fallingBomb.radius);
+    }
+  }
+
+  for (const cell of cells) {
+    const old = board[cell.y][cell.x];
+    if (!old) continue;
+    burstCell(cell.x, cell.y, colorOf(old.type), 10);
+    board[cell.y][cell.x] = null;
+  }
+
+  burstCell(cx, cy, theme().danger, 18);
+  slowmo = Math.max(slowmo, 280);
+  shake = Math.max(shake, 9);
+  recoveryMode = Math.max(recoveryMode, 0.55);
+  score += cells.length * 70;
+  addMessage("BOMB", theme().danger);
+  fallingBomb = null;
+}
+
+function updateFallingBomb(rawDt) {
+  if (!fallingBomb) return;
+
+  const xDelta = fallingBomb.targetX - fallingBomb.x;
+  const xStep = rawDt * 0.011;
+  if (Math.abs(xDelta) <= xStep) {
+    fallingBomb.x = fallingBomb.targetX;
+  } else {
+    fallingBomb.x += Math.sign(xDelta) * xStep;
+  }
+
+  fallingBomb.y += rawDt * (0.007 + speedFactor * 0.0007);
+
+  if (fallingBomb.y >= fallingBomb.targetY) {
+    explodeFallingBomb();
+  }
+}
+
+function fireLaser() {
+  if (laserCooldownMs > 0) return;
+  laserCooldownMs = SPECIAL_COOLDOWN_MS;
+  clearBottomRows(5, "LASER", theme().accent);
+}
+
+function triggerAutoSave() {
+  if (autoSaveCooldownMs > 0) return false;
+  autoSaveCooldownMs = 8000;
+  clearBottomRows(Math.min(5, Math.max(3, Math.floor(H * 0.22))), "AUTO SAVE", theme().accent);
+  return true;
+}
+
 bindHoldButton(btnLeft, () => userNudge(-1), 90, true);
 bindHoldButton(btnRight, () => userNudge(1), 90, true);
 bindHoldButton(btnDown, () => userSoftDrop(), 55, true);
 bindHoldButton(btnUp, () => userHardDrop(), 120, false);
 bindHoldButton(btnA, () => userRotate(1), 115, true);
 bindHoldButton(btnB, () => userRotate(-1), 115, true);
+bindHoldButton(btnC, () => dropBomb(), 120, false);
+bindHoldButton(btnD, () => fireLaser(), 120, false);
+bindHoldButton(miniBombBtn, () => dropBomb(), 120, false);
+bindHoldButton(miniLaserBtn, () => fireLaser(), 120, false);
 
 function spawnPiece() {
   fillQueue();
@@ -1225,7 +1566,7 @@ function spawnPiece() {
     rot: 0,
     shape,
     x: Math.floor((W - shape[0].length) / 2),
-    y: -2
+    y: -shape.length
   };
 
   pieceIndex++;
@@ -1233,7 +1574,11 @@ function spawnPiece() {
   maybeCreateExecutionError(type);
 
   if (collision(current.shape, current.x, current.y)) {
-    resetGame();
+    triggerAutoSave();
+    if (collision(current.shape, current.x, current.y)) {
+      board = createBoard();
+      addMessage("FULL SAVE", theme().accent);
+    }
   }
 }
 
@@ -1326,7 +1671,11 @@ function lockPiece() {
     }
   }
 
-  if (overflow) return false;
+  if (overflow) {
+    triggerAutoSave();
+    execution.activeError = null;
+    return true;
+  }
 
   if (hadExecutionError) {
     triggerMistakeReaction();
@@ -1451,7 +1800,7 @@ function updateDirector(rawDt) {
     drama.phase = PHASES.RECOVERY;
     drama.planText = "Recovery route";
     drama.controlText = execution.activeError ? "Misinput active" : "Stabilizing";
-  } else if (risk > 0.74 || maxHeight >= 15) {
+  } else if (risk > 0.74 || maxHeight >= H * 0.75) {
     drama.phase = PHASES.CRISIS;
     drama.planText = "Survive";
     drama.controlText = "Precise mode";
@@ -1459,7 +1808,7 @@ function updateDirector(rawDt) {
     drama.phase = PHASES.PAYOFF;
     drama.planText = "Tetris ready";
     drama.controlText = "Final drop";
-  } else if (risk > 0.48 || holes > 1) {
+  } else if (risk > 0.48 || holes > Math.max(1, W * 0.16)) {
     drama.phase = PHASES.TENSION;
     drama.planText = iSoon ? "Wait for I piece" : "Hold board";
     drama.controlText = execution.activeError ? "Misinput active" : "Stable";
@@ -1488,6 +1837,16 @@ function updateDirector(rawDt) {
   }
 }
 
+function updateAbilityButton(button, label, cooldownMs) {
+  if (cooldownMs > 0) {
+    button.textContent = `${label}${Math.ceil(cooldownMs / 1000)}`;
+    button.disabled = true;
+  } else {
+    button.textContent = label;
+    button.disabled = false;
+  }
+}
+
 function updateCompactUI() {
   const nextType = nextQueue[0] || "I";
   nextPiece.innerHTML = "";
@@ -1505,18 +1864,18 @@ function updateCompactUI() {
     }
   }
 
+  updateAbilityButton(btnC, "C", bombCooldownMs);
+  updateAbilityButton(btnD, "D", laserCooldownMs);
+  updateAbilityButton(miniBombBtn, "✹", bombCooldownMs);
+  updateAbilityButton(miniLaserBtn, "━", laserCooldownMs);
+  updateSizeUI();
+
   if (paused) {
-    statusChip.textContent = "PAUSED • DOUBLE TAP TO RESUME";
+    statusChip.textContent = "PAUSED - TAP EMPTY";
   } else if (!aiEnabled) {
-    statusChip.textContent = "MANUAL • AI OFF";
+    statusChip.textContent = "MANUAL - AI OFF";
   } else {
-    if (paused) {
-    statusChip.textContent = "PAUSED • DOUBLE TAP";
-  } else if (!aiEnabled) {
-    statusChip.textContent = "MANUAL • AI OFF";
-  } else {
-    statusChip.textContent = `${drama.phase} • ${drama.controlText}`;
-  }
+    statusChip.textContent = `${drama.phase} - ${drama.controlText}`;
   }
 }
 
@@ -1905,6 +2264,41 @@ function drawDraggedBlock() {
   ctx.restore();
 }
 
+function drawFallingBomb() {
+  if (!fallingBomb) return;
+
+  const px = OX + fallingBomb.x * CELL + CELL / 2;
+  const py = OY + fallingBomb.y * CELL + CELL / 2;
+  const r = Math.max(7, CELL * 0.42);
+
+  ctx.save();
+  ctx.globalAlpha = 0.96;
+  ctx.shadowColor = theme().danger;
+  ctx.shadowBlur = 22;
+  ctx.fillStyle = "#161827";
+  ctx.beginPath();
+  ctx.arc(px, py, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = theme().danger;
+  ctx.lineWidth = Math.max(2, CELL * 0.06);
+  ctx.stroke();
+
+  ctx.strokeStyle = theme().accent;
+  ctx.lineWidth = Math.max(1.5, CELL * 0.045);
+  ctx.beginPath();
+  ctx.moveTo(px + r * 0.45, py - r * 0.55);
+  ctx.quadraticCurveTo(px + r * 0.85, py - r * 1.1, px + r * 1.1, py - r * 0.65);
+  ctx.stroke();
+
+  ctx.fillStyle = theme().accent;
+  ctx.beginPath();
+  ctx.arc(px + r * 1.12, py - r * 0.64, Math.max(2, r * 0.16), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawMessages() {
   for (const m of messages) {
     const alpha = m.life / m.max;
@@ -1932,6 +2326,7 @@ function draw() {
   drawBoard();
   drawFlashes();
   drawCurrent();
+  drawFallingBomb();
   drawParticles();
   drawDraggedBlock();
   drawMessages();
@@ -1939,9 +2334,27 @@ function draw() {
   ctx.restore();
 }
 
+function updateCooldownTimers(rawDt) {
+  bombCooldownMs = Math.max(0, bombCooldownMs - rawDt);
+  laserCooldownMs = Math.max(0, laserCooldownMs - rawDt);
+  autoSaveCooldownMs = Math.max(0, autoSaveCooldownMs - rawDt);
+}
+
+function getDropInterval() {
+  const intervals = [760, 600, 460, 340, 245, 175, 125, 90, 65, 45];
+  return intervals[clamp(speedFactor, 1, 10) - 1];
+}
+
+function getBotInterval() {
+  const intervals = [88, 72, 58, 46, 36, 29, 23, 18, 14, 11];
+  return intervals[clamp(speedFactor, 1, 10) - 1];
+}
+
 function loop(time = 0) {
   const rawDt = time - lastTime || 16;
   lastTime = time;
+
+  updateCooldownTimers(rawDt);
 
   if (paused) {
     updateCompactUI();
@@ -1954,32 +2367,32 @@ function loop(time = 0) {
     manualOverrideMs = Math.max(0, manualOverrideMs - rawDt);
   }
 
-  const dt = rawDt * speedFactor * (slowmo > 0 ? 0.36 : 1);
-
   if (slowmo > 0) {
     slowmo -= rawDt;
     if (slowmo < 0) slowmo = 0;
   }
 
-  botCounter += dt;
-  dropCounter += dt;
+  updateFallingBomb(rawDt);
 
-  if (botCounter > 52) {
+  botCounter += rawDt;
+  dropCounter += rawDt;
+
+  if (botCounter > getBotInterval()) {
     botStep();
     botCounter = 0;
   }
 
-  let interval = executionTargetReached() ? 34 : 330;
-  if (execution.activeError === "EARLY_DROP") interval = 64;
-  if (drama.phase === PHASES.CRISIS) interval *= 0.8;
+  if (getDangerLevel(board) > 0.9 || getMaxHeight(board) >= H - 3) {
+    triggerAutoSave();
+  }
 
-  if (dropCounter > interval) {
+  if (dropCounter > getDropInterval()) {
     softDrop();
     dropCounter = 0;
   }
 
   updateDirector(rawDt);
-  updateEffects(dt);
+  updateEffects(rawDt);
   updateCompactUI();
   draw();
 
@@ -1987,6 +2400,9 @@ function loop(time = 0) {
 }
 
 function resetGame() {
+  applyGridSize(sizePresetIndex);
+  updateSizeUI();
+  speedValue.textContent = "LV " + speedFactor;
   board = createBoard();
   bag = [];
   nextQueue = [];
@@ -2006,6 +2422,10 @@ function resetGame() {
   shake = 0;
   recoveryMode = 0;
   manualOverrideMs = aiEnabled ? 0 : 999999;
+  bombCooldownMs = 0;
+  laserCooldownMs = 0;
+  autoSaveCooldownMs = 0;
+  fallingBomb = null;
   paused = false;
   dragState.active = false;
   dragState.kind = null;
