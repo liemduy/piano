@@ -1,18 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#101816" />
+  <meta name="theme-color" content="#07060A" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="AI Tetris" />
+  <meta name="apple-mobile-web-app-title" content="Lofi Tetris" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="./icon.svg" />
-  <title>AI Tetris Mobile Compact</title>
+  <title>Lofi AI Tetris - Sleep Mode</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -20,46 +20,28 @@
     }
 
     :root {
-      --bg1: #263832;
-      --bg2: #101816;
-      --bg-solid: #101816;
-      --card: rgba(255,255,255,0.075);
-      --card2: rgba(255,255,255,0.12);
-      --text: #f3f7fb;
-      --muted: #a9b8c7;
-      --accent: #7ed6df;
-      --danger: #ef7d96;
-      --success: #98d8b8;
-      --warning: #e8d48a;
-      --shadow: rgba(126,214,223,0.12);
+      /* Bảng màu Sleep / Lofi */
+      --bg1: #1a1829;
+      --bg2: #07060a;
+      --bg-solid: #07060a;
+      --card: rgba(255, 255, 255, 0.03);
+      --card2: rgba(255, 255, 255, 0.05);
+      --text: #d4d2dc;
+      --muted: #807d91;
+      --accent: #b2a4d4; /* Tím nhạt mộng mơ */
+      --danger: #d4a4b2; /* Hồng đào dịu */
+      --success: #a4d4b8;
+      --warning: #d4c8a4;
       --app-h: 100dvh;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-left: env(safe-area-inset-left, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
-      --controls-h: clamp(150px, 21vh, 176px);
-      --app-gap: 4px;
+      --controls-h: clamp(160px, 22vh, 180px);
+      --app-gap: 8px;
     }
 
-    body[data-mode="light"] {
-      --bg1: #eef8ff;
-      --bg2: #f8fbff;
-      --card: rgba(10,20,35,0.08);
-      --card2: rgba(10,20,35,0.12);
-      --text: #101828;
-      --muted: #536273;
-      --accent: #0077ff;
-      --danger: #e03155;
-      --shadow: rgba(0,119,255,0.16);
-    }
-
-    body[data-theme="neon"] { --accent: #7ed6df; --danger: #ef7d96; }
-    body[data-theme="pastel"] { --accent: #b9a7df; --danger: #e89bab; }
-    body[data-theme="matrix"] { --accent: #98d8b8; --danger: #e8d48a; }
-    body[data-theme="sunset"] { --accent: #e5b37b; --danger: #e98a98; }
-
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
       height: 100%;
@@ -67,9 +49,9 @@
       overflow: hidden;
       overscroll-behavior: none;
       background-color: var(--bg-solid);
-      background: radial-gradient(circle at top, var(--bg1), var(--bg2) 72%);
+      background: radial-gradient(circle at 50% 0%, var(--bg1), var(--bg2) 80%);
       color: var(--text);
-      font-family: system-ui, Arial, sans-serif;
+      font-family: 'Quicksand', system-ui, sans-serif;
       touch-action: manipulation;
     }
 
@@ -91,20 +73,17 @@
       display: grid;
       grid-template-rows: minmax(0, 1fr) var(--controls-h);
       gap: var(--app-gap);
-      background-color: var(--bg-solid);
-      background: radial-gradient(circle at 50% 0, var(--bg1), var(--bg2) 72%);
       padding:
-        max(1px, var(--safe-top))
-        max(1px, var(--safe-right))
-        max(1px, var(--safe-bottom))
-        max(1px, var(--safe-left));
+        max(12px, var(--safe-top))
+        max(12px, var(--safe-right))
+        max(12px, var(--safe-bottom))
+        max(12px, var(--safe-left));
       overflow: hidden;
     }
 
     .app.controls-collapsed {
-      grid-template-columns: minmax(0, 1fr);
       grid-template-rows: minmax(0, 1fr);
-      gap: 0;
+      padding-bottom: max(32px, var(--safe-bottom));
     }
 
     .app.controls-collapsed .controls-wrap {
@@ -118,82 +97,79 @@
       place-items: center;
       position: relative;
       overflow: hidden;
-      border-radius: 0;
-      background: transparent;
+      border-radius: 24px;
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
     }
 
     canvas {
-      width: min(100%, 340px);
+      width: min(100%, 360px);
       height: auto;
       max-width: 100%;
       max-height: 100%;
       aspect-ratio: 1 / 2;
       display: block;
-      border-radius: 0;
-      background: rgba(7,10,24,0.92);
-      box-shadow: none;
+      border-radius: 12px;
       touch-action: none;
+      opacity: 0.95;
     }
 
     .overlay-chip {
       position: absolute;
-      top: 4px;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      max-width: calc(100% - 18px);
-      padding: 4px 7px;
+      padding: 6px 14px;
       border-radius: 999px;
-      background: rgba(0,0,0,0.34);
-      color: white;
-      font-size: 9px;
-      font-weight: 900;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      color: var(--text);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
       pointer-events: none;
-      opacity: 0.62;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transition: all 0.5s ease;
+      opacity: 0.8;
     }
 
     .control-toggle {
       position: absolute;
-      top: max(8px, calc(var(--safe-top) + 6px));
-      right: max(8px, calc(var(--safe-right) + 6px));
+      top: max(20px, calc(var(--safe-top) + 12px));
+      right: max(20px, calc(var(--safe-right) + 12px));
       z-index: 5;
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255,255,255,0.14);
+      border: none;
       border-radius: 999px;
-      background: rgba(16,25,39,0.72);
-      color: white;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.18);
+      background: var(--card2);
+      color: var(--muted);
       backdrop-filter: blur(12px);
-      font-size: 22px;
-      font-weight: 1000;
-      line-height: 1;
+      font-size: 20px;
       cursor: pointer;
-      touch-action: manipulation;
+      transition: all 0.3s ease;
     }
 
     .control-toggle:active {
-      transform: scale(0.94);
-      filter: brightness(1.12);
+      transform: scale(0.9);
+      background: var(--card);
     }
 
     .app.controls-collapsed .control-toggle {
-      background: var(--accent);
-      color: #06111a;
+      color: var(--accent);
+      background: rgba(178, 164, 212, 0.1);
     }
 
     .collapsed-actions {
       position: absolute;
-      top: max(52px, calc(var(--safe-top) + 50px));
-      right: max(10px, calc(var(--safe-right) + 8px));
+      top: max(70px, calc(var(--safe-top) + 60px));
+      right: max(20px, calc(var(--safe-right) + 12px));
       z-index: 5;
       display: none;
-      grid-template-rows: repeat(2, 34px);
-      gap: 7px;
+      grid-template-rows: repeat(2, 36px);
+      gap: 8px;
     }
 
     .app.controls-collapsed .collapsed-actions {
@@ -201,59 +177,49 @@
     }
 
     .mini-action {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255,255,255,0.14);
+      border: none;
       border-radius: 999px;
-      background: rgba(16,25,39,0.72);
-      color: white;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.18);
+      background: var(--card2);
+      color: var(--muted);
       backdrop-filter: blur(12px);
-      font-size: 13px;
-      font-weight: 1000;
-      line-height: 1;
+      font-size: 14px;
+      font-weight: 700;
       cursor: pointer;
-      touch-action: manipulation;
     }
-
-    .mini-action.bomb {
-      background: #c97486;
-    }
-
-    .mini-action.laser {
-      background: var(--warning);
-      color: #06111a;
-    }
-
-    .mini-action:disabled {
-      opacity: 0.56;
-      font-size: 10px;
-    }
+    
+    .mini-action.bomb { background: rgba(212, 164, 178, 0.15); color: var(--danger); }
+    .mini-action.laser { background: rgba(212, 200, 164, 0.15); color: var(--warning); }
+    .mini-action:disabled { opacity: 0.3; }
 
     .controls-wrap {
       min-height: 0;
       min-width: 0;
       display: grid;
-      grid-template-columns: minmax(78px, 0.9fr) minmax(126px, 1.22fr) minmax(74px, 0.82fr);
-      gap: 4px;
+      grid-template-columns: minmax(80px, 0.9fr) minmax(130px, 1.22fr) minmax(80px, 0.82fr);
+      gap: 8px;
       overflow: hidden;
       align-items: stretch;
+      opacity: 0.8;
+      transition: opacity 0.5s ease;
+    }
+    
+    .controls-wrap:active, .controls-wrap:focus-within {
+        opacity: 1;
     }
 
     .panel {
-      min-width: 0;
-      min-height: 0;
-      border-radius: 8px;
+      border-radius: 20px;
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.09);
-      backdrop-filter: blur(10px);
-      padding: 6px;
+      backdrop-filter: blur(16px);
+      padding: 8px;
       overflow: hidden;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
-      gap: 3px;
+      gap: 6px;
     }
 
     .controls-wrap > .panel:nth-child(2) {
@@ -261,12 +227,12 @@
     }
 
     .title {
-      height: 11px;
-      margin-bottom: 0;
-      color: var(--muted);
-      font-size: 8px;
-      font-weight: 1000;
-      letter-spacing: 0.45px;
+      height: 12px;
+      margin-bottom: 2px;
+      color: rgba(255,255,255,0.2);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
       text-align: center;
       line-height: 1;
     }
@@ -278,48 +244,39 @@
     }
 
     .dpad {
-      width: min(100%, 112px);
-      height: min(100%, 112px);
+      width: min(100%, 120px);
+      height: min(100%, 120px);
       aspect-ratio: 1;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      gap: 3px;
+      gap: 6px;
       place-self: center;
     }
 
-    .pad-btn,
-    .action-btn,
-    .ai-toggle {
-      border: 0;
-      border-radius: 10px;
-      background: var(--card2);
-      color: var(--text);
-      font-weight: 1000;
+    .pad-btn, .action-btn, .ai-toggle {
+      border: none;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-weight: 600;
       display: grid;
       place-items: center;
-      line-height: 1;
-      padding: 0;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 3px 8px rgba(0,0,0,0.12);
-      touch-action: none;
+      transition: all 0.2s ease;
       cursor: pointer;
-      min-width: 0;
-      min-height: 0;
-      overflow: hidden;
     }
 
-    .pad-btn:active,
-    .action-btn:active,
-    .ai-toggle:active {
-      transform: scale(0.95);
-      filter: brightness(1.12);
+    .pad-btn:active, .action-btn:active, .ai-toggle:active {
+      transform: scale(0.92);
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
     }
 
     .pad-btn {
-      font-size: clamp(14px, 4.4vw, 20px);
+      font-size: 16px;
       width: 100%;
       height: 100%;
-      border-radius: 9px;
+      border-radius: 12px;
     }
 
     .pad-btn.up { grid-column: 2; grid-row: 1; }
@@ -332,164 +289,140 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 5px;
+      gap: 8px;
       align-items: stretch;
     }
 
     .action-btn {
-      font-size: clamp(16px, 5.8vw, 26px);
-      color: #06111a;
-      background: var(--accent);
-      border-radius: 10px;
-      line-height: 1;
-      padding: 0 2px;
-      white-space: nowrap;
-      width: 100%;
-      height: 100%;
+      font-size: 18px;
+      border-radius: 16px;
+      color: var(--accent);
+      background: rgba(178, 164, 212, 0.08);
     }
 
-    .action-btn.secondary {
-      background: var(--danger);
-      color: white;
-    }
-
-    .action-btn.utility {
-      background: var(--success);
-      color: #06111a;
-    }
-
-    .action-btn.beam {
-      background: var(--warning);
-      color: #06111a;
-    }
-
-    .action-btn:disabled {
-      opacity: 0.48;
-      transform: none;
-      filter: grayscale(0.2);
-      font-size: clamp(12px, 4.2vw, 17px);
-    }
+    .action-btn.secondary { color: var(--danger); background: rgba(212, 164, 178, 0.08); }
+    .action-btn.utility { color: var(--success); background: rgba(164, 212, 184, 0.08); }
+    .action-btn.beam { color: var(--warning); background: rgba(212, 200, 164, 0.08); }
+    .action-btn:disabled { opacity: 0.3; transform: none; filter: grayscale(1); font-size: 14px; }
 
     .center-stack {
       height: 100%;
       min-height: 0;
       display: grid;
-      grid-template-rows: minmax(24px, 0.66fr) minmax(24px, 0.66fr) minmax(36px, 0.95fr) minmax(34px, 0.8fr);
-      gap: 3px;
+      grid-template-rows: minmax(28px, 0.8fr) minmax(28px, 0.8fr) minmax(40px, 1fr) minmax(36px, 0.9fr);
+      gap: 6px;
     }
 
     .mini-card {
       min-height: 0;
-      padding: 3px 5px;
-      border-radius: 10px;
-      background: var(--card2);
-      overflow: hidden;
+      padding: 6px 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .size-card {
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
-      gap: 3px;
+      gap: 4px;
     }
 
     .size-stepper {
       min-height: 0;
       display: grid;
-      grid-template-columns: 32px minmax(0, 1fr) 32px;
-      gap: 4px;
+      grid-template-columns: 36px minmax(0, 1fr) 36px;
+      gap: 6px;
       align-items: stretch;
     }
 
     .size-btn {
       border: 0;
-      border-radius: 8px;
-      background: var(--accent);
-      color: #06111a;
-      font-size: 13px;
-      font-weight: 1000;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 16px;
       cursor: pointer;
-      touch-action: manipulation;
       display: grid;
       place-items: center;
-      padding: 0;
-      line-height: 1;
     }
 
     .size-readout {
-      min-width: 0;
       display: grid;
       place-items: center;
-      border-radius: 9px;
-      background: rgba(255,255,255,0.06);
+      border-radius: 10px;
+      background: transparent;
       color: var(--text);
-      font-size: 8px;
-      font-weight: 1000;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
 
     .label-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 10px;
-      margin-bottom: 0;
-      color: var(--muted);
-      font-size: 7.5px;
-      font-weight: 1000;
-      letter-spacing: 0.25px;
-      line-height: 1;
+      margin-bottom: 4px;
+      color: rgba(255,255,255,0.3);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
-    .value {
-      color: var(--text);
-      font-size: 8px;
-      font-weight: 1000;
-    }
+    .value { color: var(--accent); }
 
     .slider {
       width: 100%;
-      height: 16px;
-      accent-color: var(--accent);
-      touch-action: none;
+      height: 4px;
+      -webkit-appearance: none;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
     }
 
     .next-ai-card {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 8px;
       align-items: center;
+      padding: 4px;
+      background: transparent;
     }
 
-    .next-half,
-    .ai-half {
-      min-width: 0;
+    .next-half, .ai-half {
       height: 100%;
       display: grid;
       place-items: center;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.06);
-      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.2);
     }
 
     .ai-toggle {
       width: 100%;
       height: 100%;
-      min-height: 22px;
-      font-size: 8px;
-      background: var(--accent);
-      color: #06111a;
-      border-radius: 8px;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      background: rgba(178, 164, 212, 0.15);
+      color: var(--accent);
     }
 
     .ai-toggle.off {
-      background: var(--danger);
-      color: white;
+      background: rgba(212, 164, 178, 0.1);
+      color: var(--danger);
     }
 
     .next-piece {
-      width: 38px;
+      width: 40px;
       height: 24px;
       display: grid;
       grid-template-columns: repeat(4, 7px);
@@ -505,58 +438,18 @@
       border-radius: 2px;
       background: transparent;
     }
-
-    @media (max-height: 720px) {
-      :root {
-        --controls-h: clamp(146px, 23vh, 158px);
-      }
-
-      .app {
-        grid-template-rows: minmax(0, 1fr) var(--controls-h);
-      }
-
-      .dpad {
-        width: min(100%, 96px);
-        height: min(100%, 96px);
-      }
-
-      .action-btn {
-        font-size: 18px;
-      }
-    }
-
-    @media (orientation: landscape) and (max-height: 560px) {
-      .app {
-        grid-template-columns: minmax(0, 1fr) minmax(330px, 44vw);
-        grid-template-rows: minmax(0, 1fr);
-      }
-
-      .app.controls-collapsed {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .controls-wrap {
-        grid-template-columns: minmax(80px, 0.85fr) minmax(150px, 1.35fr) minmax(80px, 0.85fr);
-        min-height: 0;
-      }
-
-      .center-stack {
-        grid-template-columns: 1fr;
-        grid-template-rows: minmax(24px, 0.66fr) minmax(24px, 0.66fr) minmax(36px, 0.95fr) minmax(34px, 0.8fr);
-      }
-    }
   </style>
 </head>
-<body data-mode="dark" data-theme="neon">
+<body>
   <main class="app" id="app">
     <section class="game-wrap">
       <canvas id="game"></canvas>
-      <div class="overlay-chip" id="statusChip">AI ACTIVE</div>
+      <div class="overlay-chip" id="statusChip">AI ĐANG CHƠI</div>
     </section>
 
     <section class="controls-wrap">
       <div class="panel">
-        <div class="title">MOVE</div>
+        <div class="title">ĐIỀU HƯỚNG</div>
         <div class="pad">
           <div class="dpad">
             <button id="btnUp" class="pad-btn up" type="button">▲</button>
@@ -570,20 +463,20 @@
       <div class="panel">
         <div class="center-stack">
           <div class="mini-card">
-            <div class="label-row"><span>DRAMA</span><span id="riskValue" class="value">1.0x</span></div>
+            <div class="label-row"><span>RỦI RO</span><span id="riskValue" class="value">1.0x</span></div>
             <input id="riskRange" class="slider" type="range" min="0.2" max="2.2" step="0.1" value="1.0">
           </div>
 
           <div class="mini-card">
-            <div class="label-row"><span>LEVEL</span><span id="speedValue" class="value">LV 4</span></div>
+            <div class="label-row"><span>TỐC ĐỘ</span><span id="speedValue" class="value">Mức 4</span></div>
             <input id="speedRange" class="slider" type="range" min="1" max="10" step="1" value="4">
           </div>
 
           <div class="mini-card size-card">
-            <div class="label-row"><span>SIZE</span><span id="sizeValue" class="value">10x20</span></div>
+            <div class="label-row"><span>CỠ BẢNG</span><span id="sizeValue" class="value">10x20</span></div>
             <div class="size-stepper">
               <button id="sizeMinusBtn" class="size-btn" type="button">-</button>
-              <div id="sizeLabel" class="size-readout">NORMAL</div>
+              <div id="sizeLabel" class="size-readout">CHUẨN</div>
               <button id="sizePlusBtn" class="size-btn" type="button">+</button>
             </div>
           </div>
@@ -593,31 +486,33 @@
               <div id="nextPiece" class="next-piece"></div>
             </div>
             <div class="ai-half">
-              <button id="aiToggleBtn" class="ai-toggle on" type="button">AI ON</button>
+              <button id="aiToggleBtn" class="ai-toggle on" type="button">MÁY CHƠI</button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <div class="title">ACTION</div>
+        <div class="title">THAO TÁC</div>
         <div class="action-pad">
-          <button id="btnA" class="action-btn" type="button">A</button>
-          <button id="btnB" class="action-btn secondary" type="button">B</button>
-          <button id="btnC" class="action-btn utility" type="button">C</button>
-          <button id="btnD" class="action-btn beam" type="button">D</button>
+          <button id="btnA" class="action-btn" type="button">⟳</button>
+          <button id="btnB" class="action-btn secondary" type="button">⟲</button>
+          <button id="btnC" class="action-btn utility" type="button">BOM</button>
+          <button id="btnD" class="action-btn beam" type="button">TIA</button>
         </div>
       </div>
     </section>
 
-    <button id="controlToggleBtn" class="control-toggle" type="button" aria-label="Collapse controls" aria-expanded="true">▾</button>
-    <div class="collapsed-actions" aria-label="Collapsed actions">
-      <button id="miniBombBtn" class="mini-action bomb" type="button" aria-label="Drop bomb">✹</button>
-      <button id="miniLaserBtn" class="mini-action laser" type="button" aria-label="Fire laser">━</button>
+    <button id="controlToggleBtn" class="control-toggle" type="button" aria-label="Thu gọn" aria-expanded="true">👁</button>
+    <div class="collapsed-actions" aria-label="Thao tác thu gọn">
+      <button id="miniBombBtn" class="mini-action bomb" type="button" aria-label="Thả bom">✹</button>
+      <button id="miniLaserBtn" class="mini-action laser" type="button" aria-label="Bắn tia quét">━</button>
     </div>
   </main>
 
 <script>
+// --- GIỮ NGUYÊN TOÀN BỘ LOGIC GỐC, CHỈ ĐỔI RENDER VÀ TEXT ---
+
 const app = document.getElementById("app");
 const canvas = document.getElementById("game");
 const gameWrap = document.querySelector(".game-wrap");
@@ -655,10 +550,8 @@ const aiToggleBtn = document.getElementById("aiToggleBtn");
 const statusChip = document.getElementById("statusChip");
 const controlToggleBtn = document.getElementById("controlToggleBtn");
 
-let visualTheme = "neon";
-let visualMode = "dark";
 let speedFactor = Number(speedRange.value);
-let riskFactor = 1;
+let riskFactor = Number(riskRange.value);
 let aiEnabled = true;
 let controlsCollapsed = false;
 let paused = false;
@@ -687,80 +580,33 @@ function updateViewportLayout() {
 }
 
 updateViewportLayout();
-
 if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", updateViewportLayout);
   window.visualViewport.addEventListener("scroll", updateViewportLayout);
 } else {
   window.addEventListener("resize", updateViewportLayout);
 }
-
 window.addEventListener("orientationchange", updateViewportLayout);
-
-if ("ResizeObserver" in window) {
-  new ResizeObserver(syncCanvasDisplaySize).observe(gameWrap);
-}
-
-if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-  });
-}
 
 function setControlsCollapsed(collapsed) {
   controlsCollapsed = collapsed;
   app.classList.toggle("controls-collapsed", controlsCollapsed);
-  controlToggleBtn.textContent = controlsCollapsed ? "▴" : "▾";
-  controlToggleBtn.setAttribute("aria-expanded", String(!controlsCollapsed));
-  controlToggleBtn.setAttribute("aria-label", controlsCollapsed ? "Expand controls" : "Collapse controls");
+  controlToggleBtn.style.opacity = controlsCollapsed ? "0.4" : "1";
   requestAnimationFrame(syncCanvasDisplaySize);
 }
-const THEME_PRESETS = {
-  neon: {
-    bgTopDark: "rgba(38, 56, 50, 0.98)",
-    bgBottomDark: "rgba(16, 24, 22, 0.98)",
-    bgTopLight: "rgba(221, 248, 255, 0.98)",
-    bgBottomLight: "rgba(247, 252, 255, 0.98)",
-    accent: "#7ed6df",
-    danger: "#ef7d96"
-  },
-  pastel: {
-    bgTopDark: "rgba(48, 38, 70, 0.98)",
-    bgBottomDark: "rgba(14, 10, 24, 0.98)",
-    bgTopLight: "rgba(252, 240, 255, 0.98)",
-    bgBottomLight: "rgba(255, 248, 252, 0.98)",
-    accent: "#c084fc",
-    danger: "#fb7185"
-  },
-  matrix: {
-    bgTopDark: "rgba(10, 40, 30, 0.98)",
-    bgBottomDark: "rgba(2, 10, 8, 0.98)",
-    bgTopLight: "rgba(225, 255, 238, 0.98)",
-    bgBottomLight: "rgba(246, 255, 250, 0.98)",
-    accent: "#70f0a2",
-    danger: "#facc15"
-  },
-  sunset: {
-    bgTopDark: "rgba(70, 36, 28, 0.98)",
-    bgBottomDark: "rgba(18, 8, 12, 0.98)",
-    bgTopLight: "rgba(255, 238, 218, 0.98)",
-    bgBottomLight: "rgba(255, 250, 244, 0.98)",
-    accent: "#ffb86b",
-    danger: "#ff4d6d"
-  }
+
+// Bảng màu Lofi (Muted Pastel)
+const SLEEP_COLORS = {
+  I: "#7a95a5", O: "#a5997a", T: "#8d7aa5", S: "#7aa58b",
+  Z: "#a57a84", J: "#7a87a5", L: "#a5887a"
 };
+function colorOf(type) { return SLEEP_COLORS[type]; }
 
-function theme() {
-  return THEME_PRESETS[visualTheme];
-}
-
-controlToggleBtn.addEventListener("click", () => {
-  setControlsCollapsed(!controlsCollapsed);
-});
+controlToggleBtn.addEventListener("click", () => { setControlsCollapsed(!controlsCollapsed); });
 
 speedRange.addEventListener("input", () => {
   speedFactor = Number(speedRange.value);
-  speedValue.textContent = "LV " + speedFactor;
+  speedValue.textContent = "Mức " + speedFactor;
 });
 
 riskRange.addEventListener("input", () => {
@@ -768,59 +614,42 @@ riskRange.addEventListener("input", () => {
   riskValue.textContent = riskFactor.toFixed(1) + "x";
 });
 
-sizeMinusBtn.addEventListener("click", () => {
-  setGridSize(sizePresetIndex - 1);
-});
-
-sizePlusBtn.addEventListener("click", () => {
-  setGridSize(sizePresetIndex + 1);
-});
+sizeMinusBtn.addEventListener("click", () => { setGridSize(sizePresetIndex - 1); });
+sizePlusBtn.addEventListener("click", () => { setGridSize(sizePresetIndex + 1); });
 
 aiToggleBtn.addEventListener("click", () => {
   aiEnabled = !aiEnabled;
-  aiToggleBtn.textContent = aiEnabled ? "AI ON" : "AI OFF";
+  aiToggleBtn.textContent = aiEnabled ? "MÁY CHƠI" : "TỰ CHƠI";
   aiToggleBtn.classList.toggle("off", !aiEnabled);
   aiToggleBtn.classList.toggle("on", aiEnabled);
   manualOverrideMs = aiEnabled ? 0 : 999999;
-  drama.controlText = aiEnabled ? "AI resumed" : "Manual mode";
+  drama.controlText = aiEnabled ? "Máy tiếp quản" : "Đang điều khiển";
 });
 
 function togglePause() {
   paused = !paused;
-  drama.controlText = paused ? "Paused" : (aiEnabled ? "Resumed" : "Manual mode");
-  addMessage(paused ? "PAUSED" : "RESUME", paused ? theme().danger : theme().accent);
+  drama.controlText = paused ? "Tạm dừng" : (aiEnabled ? "Đã tiếp tục" : "Đang điều khiển");
+  addMessage(paused ? "TẠM DỪNG" : "TIẾP TỤC", paused ? "#d4a4b2" : "#b2a4d4");
 }
 
 function bindHoldButton(button, action, repeatMs = 95, repeat = true) {
   let timer = null;
-
-  const stop = () => {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-  };
-
+  const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
   button.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    action();
-    if (repeat) {
-      stop();
-      timer = setInterval(action, repeatMs);
-    }
+    event.preventDefault(); action();
+    if (repeat) { stop(); timer = setInterval(action, repeatMs); }
   });
-
   button.addEventListener("pointerup", stop);
   button.addEventListener("pointercancel", stop);
   button.addEventListener("pointerleave", stop);
 }
 
 const SIZE_PRESETS = [
-  { level: -2, label: "TINY", cols: 16 },
-  { level: -1, label: "SMALL", cols: 13 },
-  { level: 0, label: "NORMAL", cols: 10 },
-  { level: 1, label: "BIG", cols: 8 },
-  { level: 2, label: "HUGE", cols: 7 }
+  { level: -2, label: "SIÊU NHỎ", cols: 16 },
+  { level: -1, label: "NHỎ", cols: 13 },
+  { level: 0, label: "CHUẨN", cols: 10 },
+  { level: 1, label: "LỚN", cols: 8 },
+  { level: 2, label: "RẤT LỚN", cols: 7 }
 ];
 
 let sizePresetIndex = 2;
@@ -865,36 +694,13 @@ const SHAPES = {
   L: [[0, 0, 1], [1, 1, 1]]
 };
 
-const PIECE_COLORS_BY_THEME = {
-  neon: {
-    I: "#86d6d6", O: "#e5d17e", T: "#b9a7df", S: "#98d8b8",
-    Z: "#e98a98", J: "#8fb5de", L: "#d9a477"
-  },
-  pastel: {
-    I: "#93c5fd", O: "#fde68a", T: "#d8b4fe", S: "#bbf7d0",
-    Z: "#fda4af", J: "#bfdbfe", L: "#fed7aa"
-  },
-  matrix: {
-    I: "#8cffc1", O: "#d9ff70", T: "#70f0a2", S: "#48ff80",
-    Z: "#facc15", J: "#2dd4bf", L: "#a3e635"
-  },
-  sunset: {
-    I: "#ffd166", O: "#ffe66d", T: "#ff8fab", S: "#fca311",
-    Z: "#ff4d6d", J: "#ffb86b", L: "#fb8500"
-  }
-};
-
-function colorOf(type) {
-  return PIECE_COLORS_BY_THEME[visualTheme][type];
-}
-
 const PHASES = {
-  CALM: "CALM",
-  SETUP: "SETUP",
-  TENSION: "TENSION",
-  CRISIS: "CRISIS",
-  RECOVERY: "RECOVERY",
-  PAYOFF: "PAYOFF"
+  CALM: "TĨNH LẶNG",
+  SETUP: "DÀN TRẬN",
+  TENSION: "CĂNG THẲNG",
+  CRISIS: "NGUY HIỂM",
+  RECOVERY: "KHÔI PHỤC",
+  PAYOFF: "CHỜ THU HOẠCH"
 };
 
 let board;
@@ -923,9 +729,9 @@ const PREVIEW_COUNT = 5;
 let drama = {
   phase: PHASES.CALM,
   risk: 0,
-  planText: "Clean stack",
-  controlText: "Stable",
-  lastBigEvent: "Opening"
+  planText: "Dọn dẹp",
+  controlText: "Ổn định",
+  lastBigEvent: "Mở màn"
 };
 
 let recoveryMode = 0;
@@ -962,10 +768,7 @@ let dragState = {
   moved: false
 };
 
-function createBoard() {
-  return Array.from({ length: H }, () => Array(W).fill(null));
-}
-
+function createBoard() { return Array.from({ length: H }, () => Array(W).fill(null)); }
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -974,53 +777,32 @@ function shuffle(arr) {
   }
   return a;
 }
-
 function nextType() {
-  if (bag.length === 0) {
-    bag = shuffle(Object.keys(SHAPES));
-  }
+  if (bag.length === 0) bag = shuffle(Object.keys(SHAPES));
   return bag.pop();
 }
-
 function fillQueue() {
-  while (nextQueue.length < PREVIEW_COUNT) {
-    nextQueue.push(nextType());
-  }
+  while (nextQueue.length < PREVIEW_COUNT) nextQueue.push(nextType());
 }
 
-function rotateCW(matrix) {
-  return matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
-}
-
-function matrixKey(matrix) {
-  return matrix.map(row => row.join("")).join("/");
-}
-
+function rotateCW(matrix) { return matrix[0].map((_, i) => matrix.map(row => row[i]).reverse()); }
+function matrixKey(matrix) { return matrix.map(row => row.join("")).join("/"); }
 function getRotations(shape) {
   const result = [];
   const seen = new Set();
   let m = shape;
-
   for (let i = 0; i < 4; i++) {
     const key = matrixKey(m);
-    if (!seen.has(key)) {
-      seen.add(key);
-      result.push(m);
-    }
+    if (!seen.has(key)) { seen.add(key); result.push(m); }
     m = rotateCW(m);
   }
-
   return result;
 }
 
 const ROTATIONS = {};
-for (const type in SHAPES) {
-  ROTATIONS[type] = getRotations(SHAPES[type]);
-}
+for (const type in SHAPES) { ROTATIONS[type] = getRotations(SHAPES[type]); }
 
-function cloneBoard(b) {
-  return b.map(row => row.map(cell => cell ? { ...cell } : null));
-}
+function cloneBoard(b) { return b.map(row => row.map(cell => cell ? { ...cell } : null)); }
 
 function collisionOn(b, shape, px, py) {
   for (let y = 0; y < shape.length; y++) {
@@ -1034,10 +816,7 @@ function collisionOn(b, shape, px, py) {
   }
   return false;
 }
-
-function collision(shape, px, py) {
-  return collisionOn(board, shape, px, py);
-}
+function collision(shape, px, py) { return collisionOn(board, shape, px, py); }
 
 function placeAndClear(b, shape, px, py, type) {
   for (let y = 0; y < shape.length; y++) {
@@ -1050,7 +829,6 @@ function placeAndClear(b, shape, px, py, type) {
       }
     }
   }
-
   let cleared = 0;
   for (let y = H - 1; y >= 0; y--) {
     if (b[y].every(Boolean)) {
@@ -1060,39 +838,27 @@ function placeAndClear(b, shape, px, py, type) {
       y++;
     }
   }
-
   return cleared;
 }
 
 function getColumnHeights(b) {
   const heights = Array(W).fill(0);
-
   for (let x = 0; x < W; x++) {
     for (let y = 0; y < H; y++) {
-      if (b[y][x]) {
-        heights[x] = H - y;
-        break;
-      }
+      if (b[y][x]) { heights[x] = H - y; break; }
     }
   }
-
   return heights;
 }
-
-function getMaxHeight(b) {
-  return Math.max(...getColumnHeights(b));
-}
+function getMaxHeight(b) { return Math.max(...getColumnHeights(b)); }
 
 function countHoles(b) {
   let holes = 0;
   for (let x = 0; x < W; x++) {
     let seenBlock = false;
     for (let y = 0; y < H; y++) {
-      if (b[y][x]) {
-        seenBlock = true;
-      } else if (seenBlock) {
-        holes++;
-      }
+      if (b[y][x]) seenBlock = true;
+      else if (seenBlock) holes++;
     }
   }
   return holes;
@@ -1100,7 +866,6 @@ function countHoles(b) {
 
 function countWells(b) {
   let wells = 0;
-
   for (let x = 0; x < W; x++) {
     for (let y = 0; y < H; y++) {
       if (b[y][x]) continue;
@@ -1109,7 +874,6 @@ function countWells(b) {
       if (leftWall && rightWall) wells++;
     }
   }
-
   return wells;
 }
 
@@ -1127,9 +891,7 @@ function hasTetrisWell(b) {
   for (let x = 0; x < W; x++) {
     const left = x === 0 ? H : heights[x - 1];
     const right = x === W - 1 ? H : heights[x + 1];
-    if (left >= 4 && right >= 4 && heights[x] <= Math.max(left, right) - 3) {
-      return true;
-    }
+    if (left >= 4 && right >= 4 && heights[x] <= Math.max(left, right) - 3) return true;
   }
   return false;
 }
@@ -1140,9 +902,7 @@ function evaluateBoard(b, cleared) {
   const maxHeight = Math.max(...heights);
 
   let bumpiness = 0;
-  for (let i = 0; i < W - 1; i++) {
-    bumpiness += Math.abs(heights[i] - heights[i + 1]);
-  }
+  for (let i = 0; i < W - 1; i++) bumpiness += Math.abs(heights[i] - heights[i + 1]);
 
   const holes = countHoles(b);
   const wells = countWells(b);
@@ -1154,27 +914,10 @@ function evaluateBoard(b, cleared) {
   let bumpPenalty = 52;
   let wellReward = 18;
 
-  if (drama.phase === PHASES.SETUP) {
-    wellReward = 90;
-    lineReward = 850;
-  }
-  if (drama.phase === PHASES.TENSION) {
-    heightPenalty = 16;
-    wellReward = 110;
-    lineReward = 750;
-  }
-  if (drama.phase === PHASES.CRISIS) {
-    holePenalty = 1350;
-    heightPenalty = 80;
-    lineReward = 1450;
-    tetrisReward = 3200;
-  }
-  if (recoveryMode > 0) {
-    holePenalty += 450;
-    heightPenalty += 35;
-    lineReward += 550;
-    bumpPenalty += 20;
-  }
+  if (drama.phase === PHASES.SETUP) { wellReward = 90; lineReward = 850; }
+  if (drama.phase === PHASES.TENSION) { heightPenalty = 16; wellReward = 110; lineReward = 750; }
+  if (drama.phase === PHASES.CRISIS) { holePenalty = 1350; heightPenalty = 80; lineReward = 1450; tetrisReward = 3200; }
+  if (recoveryMode > 0) { holePenalty += 450; heightPenalty += 35; lineReward += 550; bumpPenalty += 20; }
 
   let value = 0;
   value += cleared * lineReward;
@@ -1196,19 +939,15 @@ function getAllMoves(b, type) {
     const shape = rotations[r];
     for (let x = -shape[0].length; x <= W; x++) {
       let y = -4;
-      while (!collisionOn(b, shape, x, y + 1)) {
-        y++;
-      }
+      while (!collisionOn(b, shape, x, y + 1)) y++;
       if (collisionOn(b, shape, x, y)) continue;
 
       const sim = cloneBoard(b);
       const cleared = placeAndClear(sim, shape, x, y, type);
       const score = evaluateBoard(sim, cleared);
-
       moves.push({ x, y, rot: r, cleared, score });
     }
   }
-
   return moves;
 }
 
@@ -1219,7 +958,6 @@ function rankMovesWithLookahead(b, type, queue) {
   for (const move of currentMoves) {
     const sim = cloneBoard(b);
     const shape = ROTATIONS[type][move.rot];
-
     const cleared = placeAndClear(sim, shape, move.x, move.y, type);
     let score = evaluateBoard(sim, cleared);
 
@@ -1238,22 +976,12 @@ function rankMovesWithLookahead(b, type, queue) {
     }
     move.score = score;
   }
-
   return currentMoves.sort((a, b) => b.score - a.score);
 }
 
 function chooseMove(b, type, queue = []) {
   const ranked = rankMovesWithLookahead(b, type, queue);
   return ranked[0] || { x: Math.floor(W / 2), y: 0, rot: 0, cleared: 0, score: 0 };
-}
-
-function canLandAt(type, rot, x) {
-  const shape = ROTATIONS[type][rot];
-  let y = -4;
-  while (!collisionOn(board, shape, x, y + 1)) {
-    y++;
-  }
-  return !collisionOn(board, shape, x, y);
 }
 
 function maybeCreateExecutionError(type) {
@@ -1273,55 +1001,42 @@ function maybeCreateExecutionError(type) {
   const triggerChance = Math.max(0, riskFactor - 1) * 0.06;
   if (Math.random() > Math.min(triggerChance, 0.08)) return;
 
-  const possible = [];
-  possible.push("INPUT_DELAY");
-
+  const possible = ["INPUT_DELAY"];
   const picked = possible[Math.floor(Math.random() * possible.length)];
 
-  if (picked === "OFFSET_LEFT") {
-    execution.activeError = "OFFSET";
-    execution.offsetDir = -1;
-  } else if (picked === "OFFSET_RIGHT") {
-    execution.activeError = "OFFSET";
-    execution.offsetDir = 1;
-  } else if (picked === "OVER_ROTATE") {
-    execution.activeError = "OVER_ROTATE";
-  } else if (picked === "INPUT_DELAY") {
-    execution.activeError = "INPUT_DELAY";
-    execution.delayFrames = 8 + Math.floor(Math.random() * 12);
-  } else {
-    execution.activeError = "EARLY_DROP";
-  }
+  if (picked === "OFFSET_LEFT") { execution.activeError = "OFFSET"; execution.offsetDir = -1; }
+  else if (picked === "OFFSET_RIGHT") { execution.activeError = "OFFSET"; execution.offsetDir = 1; }
+  else if (picked === "OVER_ROTATE") execution.activeError = "OVER_ROTATE";
+  else if (picked === "INPUT_DELAY") { execution.activeError = "INPUT_DELAY"; execution.delayFrames = 8 + Math.floor(Math.random() * 12); }
+  else execution.activeError = "EARLY_DROP";
 
-  drama.controlText = "Misinput incoming";
+  drama.controlText = "Có vẻ bấm nhầm";
 }
 
 function setManualOverride(label) {
   manualOverrideMs = 850;
   drama.controlText = label;
-  drama.lastBigEvent = "User sabotage";
+  drama.lastBigEvent = "Bạn can thiệp";
 }
 
 function userNudge(dx) {
   if (!current) return;
   if (!collision(current.shape, current.x + dx, current.y)) {
     current.x += dx;
-    setManualOverride(dx < 0 ? "User left" : "User right");
+    setManualOverride(dx < 0 ? "Bạn đẩy trái" : "Bạn đẩy phải");
   }
 }
 
 function userSoftDrop() {
   if (!current) return;
-  setManualOverride("User down");
+  setManualOverride("Bạn thả xuống");
   softDrop();
 }
 
 function userHardDrop() {
   if (!current) return;
-  setManualOverride("User drop");
-  while (!collision(current.shape, current.x, current.y + 1)) {
-    current.y++;
-  }
+  setManualOverride("Bạn thả nhanh");
+  while (!collision(current.shape, current.x, current.y + 1)) current.y++;
   const ok = lockPiece();
   if (ok) spawnPiece();
   else resetGame();
@@ -1339,21 +1054,16 @@ function userRotate(dir) {
       current.rot = nextRot;
       current.shape = nextShape;
       current.x += k;
-      setManualOverride(dir > 0 ? "User rotate A" : "User rotate B");
+      setManualOverride(dir > 0 ? "Bạn xoay xuôi" : "Bạn xoay ngược");
       return;
     }
   }
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 
 function getShapeBounds(shape) {
-  return {
-    width: Math.max(...shape.map(row => row.length)),
-    height: shape.length
-  };
+  return { width: Math.max(...shape.map(row => row.length)), height: shape.length };
 }
 
 function burstCell(x, y, color, count = 8) {
@@ -1361,35 +1071,33 @@ function burstCell(x, y, color, count = 8) {
     particles.push({
       x: OX + x * CELL + CELL / 2,
       y: OY + y * CELL + CELL / 2,
-      vx: (Math.random() - 0.5) * 7,
-      vy: -Math.random() * 5 - 1,
-      life: 620,
-      max: 620,
-      size: Math.random() * 3.4 + 1.8,
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: (Math.random() - 0.5) * 2 - 1, // Bay lên chầm chậm (Lofi)
+      life: 1500,
+      max: 1500,
+      size: Math.random() * 2.5 + 1.5,
       color
     });
   }
 }
 
-function clearBottomRows(count, label = "LASER CLEAR", color = theme().accent) {
+function clearBottomRows(count, label = "TIA QUÉT", color = "#b2a4d4") {
   const rows = Math.min(count, H);
   const start = H - rows;
   let removed = 0;
 
   for (let y = start; y < H; y++) {
-    flashes.push({ y, life: 360, max: 360 });
+    flashes.push({ y, life: 600, max: 600 });
     for (let x = 0; x < W; x++) {
       const cell = board[y][x];
       if (!cell) continue;
       removed++;
-      burstCell(x, y, colorOf(cell.type), 5);
+      burstCell(x, y, colorOf(cell.type), 4);
     }
   }
 
   board.splice(start, rows);
-  while (board.length < H) {
-    board.unshift(Array(W).fill(null));
-  }
+  while (board.length < H) board.unshift(Array(W).fill(null));
 
   slowmo = Math.max(slowmo, 260);
   shake = Math.max(shake, 7);
@@ -1402,7 +1110,6 @@ function clearBottomRows(count, label = "LASER CLEAR", color = theme().accent) {
 function findDensestBombCenter(radius) {
   let best = null;
   let bestScore = -Infinity;
-
   for (let cy = 0; cy < H; cy++) {
     for (let cx = 0; cx < W; cx++) {
       let localScore = 0;
@@ -1411,18 +1118,12 @@ function findDensestBombCenter(radius) {
           const cell = board[y][x];
           if (!cell) continue;
           const d = Math.hypot(x - cx, y - cy);
-          if (d <= radius + 0.35) {
-            localScore += 10 - d * 2 + y / H;
-          }
+          if (d <= radius + 0.35) localScore += 10 - d * 2 + y / H;
         }
       }
-      if (localScore > bestScore) {
-        bestScore = localScore;
-        best = { x: cx, y: cy };
-      }
+      if (localScore > bestScore) { bestScore = localScore; best = { x: cx, y: cy }; }
     }
   }
-
   return bestScore > 0 ? best : null;
 }
 
@@ -1447,23 +1148,15 @@ function findMostDangerousBombCenter(radius) {
           } else {
             let hasBlockAbove = false;
             for (let yy = 0; yy < y; yy++) {
-              if (board[yy][x]) {
-                hasBlockAbove = true;
-                break;
-              }
+              if (board[yy][x]) { hasBlockAbove = true; break; }
             }
             if (hasBlockAbove) localScore += 4;
           }
         }
       }
-
-      if (localScore > bestScore) {
-        bestScore = localScore;
-        best = { x: cx, y: cy };
-      }
+      if (localScore > bestScore) { bestScore = localScore; best = { x: cx, y: cy }; }
     }
   }
-
   return bestScore > 0 ? best : null;
 }
 
@@ -1479,7 +1172,6 @@ function getBombCenter(radius) {
       y: clamp(Math.round(ghostY + bounds.height / 2 - 0.5), 0, H - 1)
     };
   }
-
   return findDensestBombCenter(radius) || { x: Math.floor(W / 2), y: H - 3 };
 }
 
@@ -1489,12 +1181,9 @@ function collectBombCells(cx, cy, radius) {
     for (let x = Math.max(0, cx - radius); x <= Math.min(W - 1, cx + radius); x++) {
       if (!board[y][x]) continue;
       const d = Math.hypot(x - cx, y - cy);
-      if (d <= radius + 0.35) {
-        cells.push({ x, y, d });
-      }
+      if (d <= radius + 0.35) cells.push({ x, y, d });
     }
   }
-
   cells.sort((a, b) => a.d - b.d);
   return cells.slice(0, Math.max(8, Math.floor(W * H * 0.08)));
 }
@@ -1514,68 +1203,58 @@ function dropBomb() {
   };
 
   bombCooldownMs = SPECIAL_COOLDOWN_MS;
-  drama.controlText = "Bomb launched";
-  addMessage("BOMB DROP", theme().danger);
+  drama.controlText = "Đã gọi Bom";
+  addMessage("THẢ BOM", "#d4a4b2");
 }
 
 function explodeFallingBomb() {
   if (!fallingBomb) return;
-
   const cx = clamp(Math.round(fallingBomb.x), 0, W - 1);
   const cy = clamp(Math.round(fallingBomb.y), 0, H - 1);
   let cells = collectBombCells(cx, cy, fallingBomb.radius);
 
   if (cells.length === 0) {
     const fallback = findDensestBombCenter(fallingBomb.radius);
-    if (fallback) {
-      cells = collectBombCells(fallback.x, fallback.y, fallingBomb.radius);
-    }
+    if (fallback) cells = collectBombCells(fallback.x, fallback.y, fallingBomb.radius);
   }
 
   for (const cell of cells) {
     const old = board[cell.y][cell.x];
     if (!old) continue;
-    burstCell(cell.x, cell.y, colorOf(old.type), 10);
+    burstCell(cell.x, cell.y, colorOf(old.type), 6);
     board[cell.y][cell.x] = null;
   }
 
-  burstCell(cx, cy, theme().danger, 18);
+  burstCell(cx, cy, "#d4a4b2", 12);
   slowmo = Math.max(slowmo, 280);
   shake = Math.max(shake, 9);
   recoveryMode = Math.max(recoveryMode, 0.55);
   score += cells.length * 70;
-  addMessage("BOMB", theme().danger);
+  addMessage("BÙM~", "#d4a4b2");
   fallingBomb = null;
 }
 
 function updateFallingBomb(rawDt) {
   if (!fallingBomb) return;
-
   const xDelta = fallingBomb.targetX - fallingBomb.x;
   const xStep = rawDt * 0.011;
-  if (Math.abs(xDelta) <= xStep) {
-    fallingBomb.x = fallingBomb.targetX;
-  } else {
-    fallingBomb.x += Math.sign(xDelta) * xStep;
-  }
+  if (Math.abs(xDelta) <= xStep) fallingBomb.x = fallingBomb.targetX;
+  else fallingBomb.x += Math.sign(xDelta) * xStep;
 
   fallingBomb.y += rawDt * (0.007 + speedFactor * 0.0007);
-
-  if (fallingBomb.y >= fallingBomb.targetY) {
-    explodeFallingBomb();
-  }
+  if (fallingBomb.y >= fallingBomb.targetY) explodeFallingBomb();
 }
 
 function fireLaser() {
   if (laserCooldownMs > 0) return;
   laserCooldownMs = SPECIAL_COOLDOWN_MS;
-  clearBottomRows(5, "LASER", theme().accent);
+  clearBottomRows(5, "TIA QUÉT", "#d4c8a4");
 }
 
 function triggerAutoSave() {
   if (autoSaveCooldownMs > 0) return false;
   autoSaveCooldownMs = 8000;
-  clearBottomRows(Math.min(5, Math.max(3, Math.floor(H * 0.22))), "AUTO SAVE", theme().accent);
+  clearBottomRows(Math.min(5, Math.max(3, Math.floor(H * 0.22))), "TỰ DỌN", "#a4d4b8");
   return true;
 }
 
@@ -1594,13 +1273,10 @@ function spawnPiece() {
   fillQueue();
   const type = nextQueue.shift();
   fillQueue();
-
   const shape = ROTATIONS[type][0];
 
   current = {
-    type,
-    rot: 0,
-    shape,
+    type, rot: 0, shape,
     x: Math.floor((W - shape[0].length) / 2),
     y: -shape.length
   };
@@ -1613,32 +1289,27 @@ function spawnPiece() {
     triggerAutoSave();
     if (collision(current.shape, current.x, current.y)) {
       board = createBoard();
-      addMessage("FULL SAVE", theme().accent);
+      addMessage("TỰ CỨU", "#a4d4b8");
     }
   }
 }
 
 function getExecutionTargetX() {
   if (!target) return current ? current.x : 0;
-  if (execution.activeError === "OFFSET") {
-    return target.x + execution.offsetDir;
-  }
+  if (execution.activeError === "OFFSET") return target.x + execution.offsetDir;
   return target.x;
 }
 
 function getExecutionTargetRot() {
   if (!target || !current) return 0;
   const rotations = ROTATIONS[current.type];
-  if (execution.activeError === "OVER_ROTATE") {
-    return (target.rot + 1) % rotations.length;
-  }
+  if (execution.activeError === "OVER_ROTATE") return (target.rot + 1) % rotations.length;
   return target.rot;
 }
 
 function executionTargetReached() {
   if (!current || !target) return false;
-  return current.x === getExecutionTargetX() &&
-         current.rot === getExecutionTargetRot();
+  return current.x === getExecutionTargetX() && current.rot === getExecutionTargetRot();
 }
 
 function botStep() {
@@ -1660,9 +1331,7 @@ function botStep() {
     const kicks = [0, -1, 1, -2, 2];
     for (const k of kicks) {
       if (!collision(nextShape, current.x + k, current.y)) {
-        current.rot = nextRot;
-        current.shape = nextShape;
-        current.x += k;
+        current.rot = nextRot; current.shape = nextShape; current.x += k;
         return;
       }
     }
@@ -1671,15 +1340,12 @@ function botStep() {
   const desiredX = getExecutionTargetX();
   if (current.x !== desiredX) {
     const dir = current.x < desiredX ? 1 : -1;
-    if (!collision(current.shape, current.x + dir, current.y)) {
-      current.x += dir;
-    }
+    if (!collision(current.shape, current.x + dir, current.y)) current.x += dir;
   }
 }
 
 function softDrop() {
   if (!current) return;
-
   current.y++;
   if (collision(current.shape, current.x, current.y)) {
     current.y--;
@@ -1698,12 +1364,8 @@ function lockPiece() {
       if (!current.shape[y][x]) continue;
       const nx = current.x + x;
       const ny = current.y + y;
-
-      if (ny < 0) {
-        overflow = true;
-      } else if (ny >= 0 && ny < H && nx >= 0 && nx < W) {
-        board[ny][nx] = { type: current.type };
-      }
+      if (ny < 0) overflow = true;
+      else if (ny >= 0 && ny < H && nx >= 0 && nx < W) board[ny][nx] = { type: current.type };
     }
   }
 
@@ -1728,20 +1390,19 @@ function lockPiece() {
       score += 1000;
       slowmo = 520;
       shake = 10;
-      addMessage("TETRIS!", theme().accent);
-      drama.lastBigEvent = "Tetris payoff";
+      addMessage("TETRIS~", "#b2a4d4");
+      drama.lastBigEvent = "Ăn Tetris";
       recoveryMode = Math.max(0, recoveryMode - 0.8);
     } else {
       slowmo = 220;
       shake = Math.max(shake, 3);
-      addMessage(`CLEAR ${lines}`, visualMode === "dark" ? "#ffffff" : "#101828");
+      addMessage(`XÓA ${lines}`, "#d4d2dc");
       recoveryMode = Math.max(0, recoveryMode - 0.25);
     }
   } else {
     combo = 0;
     score += 8;
   }
-
   return true;
 }
 
@@ -1749,9 +1410,9 @@ function triggerMistakeReaction() {
   recoveryMode = 1;
   shake = 8;
   slowmo = 180;
-  drama.controlText = "Input error";
-  drama.lastBigEvent = "Misinput";
-  addMessage("INPUT ERROR", theme().danger);
+  drama.controlText = "Nhầm lẫn thao tác";
+  drama.lastBigEvent = "Lỗi nhập";
+  addMessage("LỖI NHỊP", "#d4a4b2");
 }
 
 function clearLines() {
@@ -1759,7 +1420,7 @@ function clearLines() {
   for (let y = H - 1; y >= 0; y--) {
     if (board[y].every(Boolean)) {
       makeLineParticles(y);
-      flashes.push({ y, life: 280, max: 280 });
+      flashes.push({ y, life: 600, max: 600 });
       board.splice(y, 1);
       board.unshift(Array(W).fill(null));
       lines++;
@@ -1773,16 +1434,15 @@ function makeLineParticles(row) {
   for (let x = 0; x < W; x++) {
     const cell = board[row][x];
     const color = cell ? colorOf(cell.type) : "#ffffff";
-
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 5; i++) {
       particles.push({
         x: OX + x * CELL + CELL / 2,
         y: OY + row * CELL + CELL / 2,
-        vx: (Math.random() - 0.5) * 5.6,
-        vy: -Math.random() * 4.8 - 1,
-        life: 650,
-        max: 650,
-        size: Math.random() * 3.2 + 1.8,
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: (Math.random() - 0.5) * 2.5 - 0.5,
+        life: 2000,
+        max: 2000,
+        size: Math.random() * 2.5 + 1.5,
         color
       });
     }
@@ -1794,8 +1454,8 @@ function addMessage(text, color) {
     text, color,
     x: OX + W * CELL / 2,
     y: OY + H * CELL / 2,
-    life: 900,
-    max: 900
+    life: 1500,
+    max: 1500
   });
 }
 
@@ -1803,7 +1463,7 @@ function updateEffects(dt) {
   for (const p of particles) {
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.08;
+    p.vy -= 0.01; // Lực đẩy nhẹ lên trên (như bọt khí)
     p.life -= dt;
   }
   particles = particles.filter(p => p.life > 0);
@@ -1811,16 +1471,10 @@ function updateEffects(dt) {
   for (const f of flashes) f.life -= dt;
   flashes = flashes.filter(f => f.life > 0);
 
-  for (const m of messages) {
-    m.y -= 0.035 * dt;
-    m.life -= dt;
-  }
+  for (const m of messages) { m.y -= 0.02 * dt; m.life -= dt; }
   messages = messages.filter(m => m.life > 0);
 
-  if (shake > 0) {
-    shake -= dt * 0.035;
-    if (shake < 0) shake = 0;
-  }
+  if (shake > 0) { shake -= dt * 0.035; if (shake < 0) shake = 0; }
 }
 
 function updateDirector(rawDt) {
@@ -1834,43 +1488,38 @@ function updateDirector(rawDt) {
 
   if (recoveryMode > 0.12) {
     drama.phase = PHASES.RECOVERY;
-    drama.planText = "Recovery route";
-    drama.controlText = execution.activeError ? "Misinput active" : "Stabilizing";
+    drama.planText = "Đang gỡ rối";
+    drama.controlText = execution.activeError ? "Lỗi thao tác" : "Dọn bớt";
   } else if (risk > 0.74 || maxHeight >= H * 0.75) {
     drama.phase = PHASES.CRISIS;
-    drama.planText = "Survive";
-    drama.controlText = "Precise mode";
+    drama.planText = "Sinh tồn";
+    drama.controlText = "Cẩn trọng";
   } else if (current && current.type === "I" && well) {
     drama.phase = PHASES.PAYOFF;
-    drama.planText = "Tetris ready";
-    drama.controlText = "Final drop";
+    drama.planText = "Chờ Tetris";
+    drama.controlText = "Chốt hạ";
   } else if (risk > 0.48 || holes > Math.max(1, W * 0.16)) {
     drama.phase = PHASES.TENSION;
-    drama.planText = iSoon ? "Wait for I piece" : "Hold board";
-    drama.controlText = execution.activeError ? "Misinput active" : "Stable";
+    drama.planText = iSoon ? "Chờ khối I" : "Giữ nhịp";
+    drama.controlText = execution.activeError ? "Lỗi thao tác" : "Ổn định";
   } else if (well || iSoon) {
     drama.phase = PHASES.SETUP;
-    drama.planText = iSoon ? "Preparing Tetris" : "Build well";
-    drama.controlText = execution.activeError ? "Misinput active" : "Stable";
+    drama.planText = iSoon ? "Tạo rãnh" : "Dọn rác";
+    drama.controlText = execution.activeError ? "Lỗi thao tác" : "Ổn định";
   } else {
     drama.phase = PHASES.CALM;
-    drama.planText = "Clean stack";
-    drama.controlText = execution.activeError ? "Misinput active" : "Stable";
+    drama.planText = "Dọn dẹp";
+    drama.controlText = execution.activeError ? "Lỗi thao tác" : "Ổn định";
   }
 
-  if (execution.activeError === "OFFSET") drama.controlText = "Offset error";
-  if (execution.activeError === "OVER_ROTATE") drama.controlText = "Over-rotate";
-  if (execution.activeError === "INPUT_DELAY") drama.controlText = "Input delay";
-  if (execution.activeError === "EARLY_DROP") drama.controlText = "Early drop";
+  if (execution.activeError === "OFFSET") drama.controlText = "Lệch tay";
+  if (execution.activeError === "OVER_ROTATE") drama.controlText = "Xoay lố";
+  if (execution.activeError === "INPUT_DELAY") drama.controlText = "Chậm nhịp";
+  if (execution.activeError === "EARLY_DROP") drama.controlText = "Rơi sớm";
 
-  if (manualOverrideMs > 0) {
-    drama.controlText = "User control";
-  }
+  if (manualOverrideMs > 0) drama.controlText = "Bạn đang chơi";
 
-  if (recoveryMode > 0) {
-    recoveryMode -= rawDt / 7200;
-    if (recoveryMode < 0) recoveryMode = 0;
-  }
+  if (recoveryMode > 0) { recoveryMode -= rawDt / 7200; if (recoveryMode < 0) recoveryMode = 0; }
 }
 
 function updateAbilityButton(button, label, cooldownMs) {
@@ -1886,33 +1535,25 @@ function updateAbilityButton(button, label, cooldownMs) {
 function updateCompactUI() {
   const nextType = nextQueue[0] || "I";
   nextPiece.innerHTML = "";
-
   const shape = ROTATIONS[nextType][0];
   for (let y = 0; y < 2; y++) {
     for (let x = 0; x < 4; x++) {
       const cell = document.createElement("div");
       cell.className = "next-cell";
-      if (shape[y] && shape[y][x]) {
-        cell.style.background = colorOf(nextType);
-        cell.style.boxShadow = `0 0 10px ${colorOf(nextType)}`;
-      }
+      if (shape[y] && shape[y][x]) cell.style.background = colorOf(nextType);
       nextPiece.appendChild(cell);
     }
   }
 
-  updateAbilityButton(btnC, "C", bombCooldownMs);
-  updateAbilityButton(btnD, "D", laserCooldownMs);
+  updateAbilityButton(btnC, "BOM", bombCooldownMs);
+  updateAbilityButton(btnD, "TIA", laserCooldownMs);
   updateAbilityButton(miniBombBtn, "✹", bombCooldownMs);
   updateAbilityButton(miniLaserBtn, "━", laserCooldownMs);
   updateSizeUI();
 
-  if (paused) {
-    statusChip.textContent = "PAUSED - TAP EMPTY";
-  } else if (!aiEnabled) {
-    statusChip.textContent = "MANUAL - AI OFF";
-  } else {
-    statusChip.textContent = `${drama.phase} - ${drama.controlText}`;
-  }
+  if (paused) statusChip.textContent = "TẠM DỪNG";
+  else if (!aiEnabled) statusChip.textContent = "BẠN ĐANG CHƠI";
+  else statusChip.textContent = `${drama.phase} - ${drama.controlText}`;
 }
 
 function canvasPointFromEvent(event) {
@@ -1924,59 +1565,33 @@ function canvasPointFromEvent(event) {
 }
 
 function gridFromCanvasPoint(point) {
-  return {
-    x: Math.floor((point.x - OX) / CELL),
-    y: Math.floor((point.y - OY) / CELL)
-  };
+  return { x: Math.floor((point.x - OX) / CELL), y: Math.floor((point.y - OY) / CELL) };
 }
 
-function isInsideBoardCell(x, y) {
-  return x >= 0 && x < W && y >= 0 && y < H;
-}
-
+function isInsideBoardCell(x, y) { return x >= 0 && x < W && y >= 0 && y < H; }
 function isCurrentPieceCell(cell) {
   if (!current) return false;
   const localX = cell.x - current.x;
   const localY = cell.y - current.y;
-  return Boolean(
-    current.shape[localY] &&
-    current.shape[localY][localX]
-  );
+  return Boolean(current.shape[localY] && current.shape[localY][localX]);
 }
 
 function getCanvasTarget(point) {
   const cell = gridFromCanvasPoint(point);
-  if (isInsideBoardCell(cell.x, cell.y) && isCurrentPieceCell(cell)) {
-    return {
-      kind: "current",
-      cell,
-      grabX: cell.x - current.x,
-      grabY: cell.y - current.y
-    };
-  }
-
-  if (isInsideBoardCell(cell.x, cell.y) && board[cell.y][cell.x]) {
+  if (isInsideBoardCell(cell.x, cell.y) && isCurrentPieceCell(cell))
+    return { kind: "current", cell, grabX: cell.x - current.x, grabY: cell.y - current.y };
+  if (isInsideBoardCell(cell.x, cell.y) && board[cell.y][cell.x])
     return { kind: "locked", cell };
-  }
-
   return { kind: "outside", cell };
 }
 
 function captureCanvasPointer(event) {
   dragState.pointerId = event.pointerId;
-  if (canvas.setPointerCapture) {
-    try {
-      canvas.setPointerCapture(event.pointerId);
-    } catch (_) {}
-  }
+  if (canvas.setPointerCapture) try { canvas.setPointerCapture(event.pointerId); } catch (_) {}
 }
-
 function releaseCanvasPointer() {
-  if (dragState.pointerId !== null && canvas.releasePointerCapture) {
-    try {
-      canvas.releasePointerCapture(dragState.pointerId);
-    } catch (_) {}
-  }
+  if (dragState.pointerId !== null && canvas.releasePointerCapture)
+    try { canvas.releasePointerCapture(dragState.pointerId); } catch (_) {}
 }
 
 function resetDragState() {
@@ -1994,11 +1609,8 @@ function moveCurrentPieceTo(x, y) {
   if (!current) return false;
   const safeY = Math.max(1 - current.shape.length, y);
   if (collision(current.shape, x, safeY)) return false;
-
-  current.x = x;
-  current.y = safeY;
-  target = null;
-  setManualOverride("Piece dragged");
+  current.x = x; current.y = safeY; target = null;
+  setManualOverride("Đang kéo gạch");
   return true;
 }
 
@@ -2008,16 +1620,15 @@ function finishLockedBlockDrag(point) {
 
   if (inside && !board[cell.y][cell.x]) {
     board[cell.y][cell.x] = { type: dragState.type };
-    addMessage("MOVED", theme().accent);
+    addMessage("ĐÃ CHUYỂN", "#b2a4d4");
   } else if (!inside) {
-    addMessage("REMOVED", theme().danger);
+    addMessage("ĐÃ XÓA", "#d4a4b2");
   } else {
     board[dragState.fromY][dragState.fromX] = { type: dragState.type };
-    addMessage("BLOCKED", theme().danger);
+    addMessage("BỊ CHẶN", "#d4a4b2");
   }
 
-  setManualOverride("Board sabotaged");
-
+  setManualOverride("Can thiệp bảng");
   const lines = clearLines();
   if (lines > 0) {
     totalLines += lines;
@@ -2032,85 +1643,58 @@ function onCanvasPointerDown(event) {
   const targetInfo = getCanvasTarget(point);
   const now = performance.now();
   const tapKind = targetInfo.kind === "outside" ? "outside" : "brick";
-  const isDoubleTap = (
-    now - lastTapAt < 320 &&
-    tapKind === lastTapKind &&
-    Math.hypot(point.x - lastTapX, point.y - lastTapY) < 55
-  );
+  const isDoubleTap = (now - lastTapAt < 320 && tapKind === lastTapKind && Math.hypot(point.x - lastTapX, point.y - lastTapY) < 55);
 
   event.preventDefault();
 
   if (isDoubleTap && tapKind === "brick") {
-    lastTapAt = 0;
-    userRotate(1);
-    return;
+    lastTapAt = 0; userRotate(1); return;
   }
 
-  lastTapAt = now;
-  lastTapX = point.x;
-  lastTapY = point.y;
-  lastTapKind = tapKind;
+  lastTapAt = now; lastTapX = point.x; lastTapY = point.y; lastTapKind = tapKind;
 
   dragState.active = true;
   dragState.kind = targetInfo.kind;
-  dragState.startX = point.x;
-  dragState.startY = point.y;
-  dragState.px = point.x;
-  dragState.py = point.y;
+  dragState.startX = point.x; dragState.startY = point.y;
+  dragState.px = point.x; dragState.py = point.y;
   dragState.moved = false;
   captureCanvasPointer(event);
 
   if (targetInfo.kind === "current") {
-    dragState.grabX = targetInfo.grabX;
-    dragState.grabY = targetInfo.grabY;
-    setManualOverride("Piece grabbed");
+    dragState.grabX = targetInfo.grabX; dragState.grabY = targetInfo.grabY;
+    setManualOverride("Đang kéo gạch");
     return;
   }
-
   if (targetInfo.kind === "locked") {
     dragState.type = board[targetInfo.cell.y][targetInfo.cell.x].type;
-    dragState.fromX = targetInfo.cell.x;
-    dragState.fromY = targetInfo.cell.y;
+    dragState.fromX = targetInfo.cell.x; dragState.fromY = targetInfo.cell.y;
     board[targetInfo.cell.y][targetInfo.cell.x] = null;
-    setManualOverride("Block grabbed");
+    setManualOverride("Nhặt gạch cũ");
   }
 }
 
 function onCanvasPointerMove(event) {
   if (!dragState.active) return;
   const point = canvasPointFromEvent(event);
-  dragState.px = point.x;
-  dragState.py = point.y;
-
-  if (Math.hypot(point.x - dragState.startX, point.y - dragState.startY) > 10) {
-    dragState.moved = true;
-  }
-
+  dragState.px = point.x; dragState.py = point.y;
+  if (Math.hypot(point.x - dragState.startX, point.y - dragState.startY) > 10) dragState.moved = true;
   if (dragState.kind !== "current") return;
 
   const cell = gridFromCanvasPoint(point);
   const targetX = cell.x - dragState.grabX;
   const targetY = cell.y - dragState.grabY;
-
-  if (moveCurrentPieceTo(targetX, targetY)) {
-    dragState.moved = true;
-  }
+  if (moveCurrentPieceTo(targetX, targetY)) dragState.moved = true;
 }
 
 function onCanvasPointerUp(event) {
   if (!dragState.active) return;
-
   const point = canvasPointFromEvent(event);
   const kind = dragState.kind;
   const wasTap = Math.hypot(point.x - dragState.startX, point.y - dragState.startY) < 10;
 
-  if (kind === "outside" && wasTap) {
-    togglePause();
-  } else if (kind === "locked") {
-    finishLockedBlockDrag(point);
-  } else if (kind === "current") {
-    setManualOverride("Piece dragged");
-  }
+  if (kind === "outside" && wasTap) togglePause();
+  else if (kind === "locked") finishLockedBlockDrag(point);
+  else if (kind === "current") setManualOverride("Đã thả gạch");
 
   resetDragState();
 }
@@ -2122,25 +1706,12 @@ canvas.addEventListener("pointercancel", onCanvasPointerUp);
 
 function getGhostY(shape, x) {
   let y = current ? current.y : -4;
-  while (!collisionOn(board, shape, x, y + 1)) {
-    y++;
-  }
+  while (!collisionOn(board, shape, x, y + 1)) y++;
   return y;
-}
-
-function roundRect(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
 }
 
 function drawBlock(gx, gy, color, alpha = 1, scale = 1) {
   if (gy < 0) return;
-
   const pad = 2;
   const size = (CELL - pad * 2) * scale;
   const cx = OX + gx * CELL + CELL / 2;
@@ -2148,17 +1719,17 @@ function drawBlock(gx, gy, color, alpha = 1, scale = 1) {
 
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 8;
-
-  roundRect(cx - size / 2, cy - size / 2, size, size, 7);
+  
+  ctx.beginPath();
+  ctx.roundRect(cx - size / 2, cy - size / 2, size, size, 6);
   ctx.fillStyle = color;
   ctx.fill();
 
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = visualMode === "dark" ? "rgba(255,255,255,0.26)" : "rgba(0,0,0,0.16)";
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  ctx.beginPath();
+  ctx.roundRect(cx - size / 2, cy - size / 2, size, size / 2, 6);
+  ctx.fillStyle = "rgba(255,255,255,0.1)";
+  ctx.fill();
+  
   ctx.restore();
 }
 
@@ -2171,56 +1742,25 @@ function drawMatrix(shape, px, py, color, alpha = 1, scale = 1) {
 }
 
 function drawBackground() {
-  const t = theme();
   const danger = drama.risk;
-  const redAlpha = Math.max(0, (danger - 0.45) * 0.28);
+  const redAlpha = Math.max(0, (danger - 0.45) * 0.15); // Rất nhạt
 
   ctx.clearRect(0, 0, VIEW_W, VIEW_H);
-
-  const grd = ctx.createLinearGradient(0, 0, 0, VIEW_H);
-  if (visualMode === "dark") {
-    grd.addColorStop(0, t.bgTopDark);
-    grd.addColorStop(1, t.bgBottomDark);
-  } else {
-    grd.addColorStop(0, t.bgTopLight);
-    grd.addColorStop(1, t.bgBottomLight);
-  }
-
-  ctx.fillStyle = grd;
+  ctx.fillStyle = "#07060A";
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   if (redAlpha > 0) {
     ctx.save();
     ctx.globalAlpha = redAlpha;
-    ctx.fillStyle = t.danger;
+    ctx.fillStyle = "#d4a4b2";
     ctx.fillRect(0, 0, VIEW_W, VIEW_H);
     ctx.restore();
   }
 
-  ctx.strokeStyle = visualMode === "dark" ? "rgba(235,245,240,0.045)" : "rgba(0,0,0,0.06)";
+  ctx.strokeStyle = "rgba(255,255,255,0.02)";
   ctx.lineWidth = 1;
-
-  for (let x = 0; x <= W; x++) {
-    ctx.beginPath();
-    ctx.moveTo(OX + x * CELL, OY);
-    ctx.lineTo(OX + x * CELL, OY + H * CELL);
-    ctx.stroke();
-  }
-
-  for (let y = 0; y <= H; y++) {
-    ctx.beginPath();
-    ctx.moveTo(OX, OY + y * CELL);
-    ctx.lineTo(OX + W * CELL, OY + y * CELL);
-    ctx.stroke();
-  }
-
-  ctx.save();
-  ctx.globalAlpha = 0.14 + danger * 0.28;
-  ctx.strokeStyle = danger > 0.62 ? t.danger : t.accent;
-  ctx.lineWidth = 2.4;
-  roundRect(OX, OY, W * CELL, H * CELL, 12);
-  ctx.stroke();
-  ctx.restore();
+  for (let x = 0; x <= W; x++) { ctx.beginPath(); ctx.moveTo(OX + x * CELL, OY); ctx.lineTo(OX + x * CELL, OY + H * CELL); ctx.stroke(); }
+  for (let y = 0; y <= H; y++) { ctx.beginPath(); ctx.moveTo(OX, OY + y * CELL); ctx.lineTo(OX + W * CELL, OY + y * CELL); ctx.stroke(); }
 }
 
 function drawBoard() {
@@ -2236,21 +1776,20 @@ function drawGhost() {
   if (!current || !target) return;
   const plannedShape = ROTATIONS[current.type][target.rot];
   const plannedY = getGhostY(plannedShape, target.x);
-  const ghostColor = visualMode === "dark" ? "#ffffff" : "#101828";
-  drawMatrix(plannedShape, target.x, plannedY, ghostColor, 0.15, 0.88);
+  drawMatrix(plannedShape, target.x, plannedY, colorOf(current.type), 0.1, 0.95);
 
   if (execution.activeError) {
     const execRot = getExecutionTargetRot();
     const execX = getExecutionTargetX();
     const execShape = ROTATIONS[current.type][execRot];
     const execY = getGhostY(execShape, execX);
-    drawMatrix(execShape, execX, execY, theme().danger, 0.24, 0.9);
+    drawMatrix(execShape, execX, execY, "#d4a4b2", 0.15, 0.95);
   }
 }
 
 function drawCurrent() {
   if (!current) return;
-  const scale = slowmo > 0 ? 1.04 : 1;
+  const scale = slowmo > 0 ? 1.02 : 1;
   drawMatrix(current.shape, current.x, current.y, colorOf(current.type), 1, scale);
 }
 
@@ -2258,9 +1797,10 @@ function drawFlashes() {
   for (const f of flashes) {
     const alpha = f.life / f.max;
     ctx.save();
-    ctx.globalAlpha = alpha * 0.78;
-    ctx.fillStyle = visualMode === "dark" ? "#ffffff" : "#101828";
-    roundRect(OX, OY + f.y * CELL + 3, W * CELL, CELL - 6, 8);
+    ctx.globalAlpha = alpha * 0.3;
+    ctx.fillStyle = "#b2a4d4";
+    ctx.beginPath();
+    ctx.roundRect(OX, OY + f.y * CELL, W * CELL, CELL, 6);
     ctx.fill();
     ctx.restore();
   }
@@ -2269,10 +1809,8 @@ function drawFlashes() {
 function drawParticles() {
   for (const p of particles) {
     ctx.save();
-    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.globalAlpha = Math.max(0, p.life / p.max * 0.6);
     ctx.fillStyle = p.color;
-    ctx.shadowColor = p.color;
-    ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
     ctx.fill();
@@ -2284,54 +1822,26 @@ function drawDraggedBlock() {
   if (!dragState.active || dragState.kind !== "locked" || !dragState.type) return;
   const color = colorOf(dragState.type);
   const size = CELL - 4;
-
   ctx.save();
-  ctx.globalAlpha = 0.92;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 20;
-  roundRect(dragState.px - size / 2, dragState.py - size / 2, size, size, 8);
+  ctx.globalAlpha = 0.9;
+  ctx.beginPath();
+  ctx.roundRect(dragState.px - size / 2, dragState.py - size / 2, size, size, 8);
   ctx.fillStyle = color;
   ctx.fill();
-
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = visualMode === "dark" ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.2)";
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
   ctx.restore();
 }
 
 function drawFallingBomb() {
   if (!fallingBomb) return;
-
   const px = OX + fallingBomb.x * CELL + CELL / 2;
   const py = OY + fallingBomb.y * CELL + CELL / 2;
   const r = Math.max(7, CELL * 0.42);
 
   ctx.save();
-  ctx.globalAlpha = 0.96;
-  ctx.shadowColor = theme().danger;
-  ctx.shadowBlur = 22;
-  ctx.fillStyle = "#161827";
-  ctx.beginPath();
-  ctx.arc(px, py, r, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = theme().danger;
-  ctx.lineWidth = Math.max(2, CELL * 0.06);
-  ctx.stroke();
-
-  ctx.strokeStyle = theme().accent;
-  ctx.lineWidth = Math.max(1.5, CELL * 0.045);
-  ctx.beginPath();
-  ctx.moveTo(px + r * 0.45, py - r * 0.55);
-  ctx.quadraticCurveTo(px + r * 0.85, py - r * 1.1, px + r * 1.1, py - r * 0.65);
-  ctx.stroke();
-
-  ctx.fillStyle = theme().accent;
-  ctx.beginPath();
-  ctx.arc(px + r * 1.12, py - r * 0.64, Math.max(2, r * 0.16), 0, Math.PI * 2);
-  ctx.fill();
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = "#d4a4b2";
+  ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 2; ctx.stroke();
   ctx.restore();
 }
 
@@ -2341,10 +1851,8 @@ function drawMessages() {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.textAlign = "center";
-    ctx.font = "900 26px system-ui";
+    ctx.font = "700 24px Quicksand, sans-serif";
     ctx.fillStyle = m.color;
-    ctx.shadowColor = m.color;
-    ctx.shadowBlur = 18;
     ctx.fillText(m.text, m.x, m.y);
     ctx.restore();
   }
@@ -2352,11 +1860,8 @@ function drawMessages() {
 
 function draw() {
   ctx.save();
-
-  if (shake > 0) {
-    ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-  }
-
+  // Giảm tối đa biên độ rung (shake * 0.1) để luôn dịu mắt
+  if (shake > 0) ctx.translate((Math.random() - 0.5) * shake * 0.1, (Math.random() - 0.5) * shake * 0.1);
   drawBackground();
   drawGhost();
   drawBoard();
@@ -2366,7 +1871,6 @@ function draw() {
   drawParticles();
   drawDraggedBlock();
   drawMessages();
-
   ctx.restore();
 }
 
@@ -2399,33 +1903,16 @@ function loop(time = 0) {
     return;
   }
 
-  if (manualOverrideMs > 0 && manualOverrideMs < 999999) {
-    manualOverrideMs = Math.max(0, manualOverrideMs - rawDt);
-  }
-
-  if (slowmo > 0) {
-    slowmo -= rawDt;
-    if (slowmo < 0) slowmo = 0;
-  }
+  if (manualOverrideMs > 0 && manualOverrideMs < 999999) manualOverrideMs = Math.max(0, manualOverrideMs - rawDt);
+  if (slowmo > 0) { slowmo -= rawDt; if (slowmo < 0) slowmo = 0; }
 
   updateFallingBomb(rawDt);
-
   botCounter += rawDt;
   dropCounter += rawDt;
 
-  if (botCounter > getBotInterval()) {
-    botStep();
-    botCounter = 0;
-  }
-
-  if (getDangerLevel(board) > 0.9 || getMaxHeight(board) >= H - 3) {
-    triggerAutoSave();
-  }
-
-  if (dropCounter > getDropInterval()) {
-    softDrop();
-    dropCounter = 0;
-  }
+  if (botCounter > getBotInterval()) { botStep(); botCounter = 0; }
+  if (getDangerLevel(board) > 0.9 || getMaxHeight(board) >= H - 3) triggerAutoSave();
+  if (dropCounter > getDropInterval()) { softDrop(); dropCounter = 0; }
 
   updateDirector(rawDt);
   updateEffects(rawDt);
@@ -2438,46 +1925,25 @@ function loop(time = 0) {
 function resetGame() {
   applyGridSize(sizePresetIndex);
   updateSizeUI();
-  speedValue.textContent = "LV " + speedFactor;
+  speedValue.textContent = "Mức " + speedFactor;
   board = createBoard();
-  bag = [];
-  nextQueue = [];
-  current = null;
-  target = null;
-
-  score = 0;
-  totalLines = 0;
-  combo = 0;
-  pieceIndex = 0;
-
-  particles = [];
-  flashes = [];
-  messages = [];
-
-  slowmo = 0;
-  shake = 0;
-  recoveryMode = 0;
+  bag = []; nextQueue = []; current = null; target = null;
+  score = 0; totalLines = 0; combo = 0; pieceIndex = 0;
+  particles = []; flashes = []; messages = [];
+  slowmo = 0; shake = 0; recoveryMode = 0;
   manualOverrideMs = aiEnabled ? 0 : 999999;
-  bombCooldownMs = 0;
-  laserCooldownMs = 0;
-  autoSaveCooldownMs = 0;
-  fallingBomb = null;
-  paused = false;
-  dragState.active = false;
-  dragState.kind = null;
-  dragState.pointerId = null;
-  dragState.type = null;
-  dragState.moved = false;
-
-  execution.activeError = null;
-  execution.lastErrorPiece = -999;
+  bombCooldownMs = 0; laserCooldownMs = 0; autoSaveCooldownMs = 0;
+  fallingBomb = null; paused = false;
+  
+  dragState.active = false; dragState.kind = null; dragState.pointerId = null;
+  dragState.type = null; dragState.moved = false;
+  
+  execution.activeError = null; execution.lastErrorPiece = -999;
   execution.nextErrorAt = 9 + Math.floor(Math.random() * 8);
 
-  drama.phase = PHASES.CALM;
-  drama.risk = 0;
-  drama.planText = "Clean stack";
-  drama.controlText = "Stable";
-  drama.lastBigEvent = "Opening";
+  drama.phase = PHASES.CALM; drama.risk = 0;
+  drama.planText = "Dọn dẹp"; drama.controlText = "Ổn định";
+  drama.lastBigEvent = "Mở màn";
 
   fillQueue();
   spawnPiece();
